@@ -11,7 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".AddReminder" />
         <activity android:name=".RemindersList" />
         <activity android:name=".PetProfile" />
         <activity android:name=".HomePage">

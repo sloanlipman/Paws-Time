@@ -27,59 +27,79 @@
             android:orientation="vertical"
             android:layout_marginTop="60dp">
 
-            <EditText
-                android:id="@+id/editText4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Pet Type" />
-
             <ImageView
-                android:id="@+id/imageView2"
+                android:id="@+id/petPicture"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:srcCompat="@tools:sample/avatars" />
+                tools:srcCompat="@tools:sample/avatars"
+                android:src="@mipmap/ic_launcher"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/petType"
+                    android:layout_width="126dp"
+                    android:layout_height="125dp"
+                    android:ems="10"
+                    android:hint="@string/pet_type"
+                    android:inputType="textMultiLine" />
+
+                <EditText
+                    android:id="@+id/petDesc"
+                    android:layout_width="297dp"
+                    android:layout_height="125dp"
+                    android:ems="10"
+                    android:hint="@string/pet_description"
+                    android:inputType="textMultiLine"
+                    tools:layout_conversion_absoluteHeight="200dp"
+                    tools:layout_conversion_absoluteWidth="411dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/petCareInstr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:ems="10"
+                    android:hint="@string/care_instructions"
+                    android:inputType="textMultiLine"
+                    tools:layout_conversion_absoluteHeight="200dp"
+                    tools:layout_conversion_absoluteWidth="411dp" />
+
+                <EditText
+                    android:id="@+id/medicalInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/medical_info"
+                    android:inputType="textMultiLine" />
+            </LinearLayout>
 
             <EditText
-                android:id="@+id/editText5"
-                android:layout_width="218dp"
-                android:layout_height="137dp"
+                android:id="@+id/preferredVetName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="@string/preferred_vet"
+                android:inputType="textMultiLine" />
+
+            <EditText
+                android:id="@+id/emergencyContactInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textMultiLine"
-                android:text="Pet Description" />
-
-            <EditText
-                android:id="@+id/editText6"
-                android:layout_width="match_parent"
-                android:layout_height="88dp"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Care Instructions" />
-
-            <EditText
-                android:id="@+id/editText"
-                android:layout_width="441dp"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Medical Info" />
-
-            <EditText
-                android:id="@+id/editText7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Preferred vet" />
-
-            <EditText
-                android:id="@+id/editText8"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Emergency Contact Info" />
+                android:hint="@string/emergency_contact_info" />
         </LinearLayout>
     </ScrollView>
 
