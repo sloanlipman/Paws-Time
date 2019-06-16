@@ -8,7 +8,7 @@
 
     <include
         android:id="@+id/include"
-        layout="@layout/activity_main"
+        layout="@layout/activity_base"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

@@ -21,6 +21,7 @@ public class RemindersList extends BaseActivity {
         return R.string.toolbar_reminders;
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

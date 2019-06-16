@@ -6,6 +6,8 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 
@@ -36,6 +38,15 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getToolbarTitle());
+        setSupportActionBar(toolbar);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.overflow_menu, menu);
+        return true;
     }
 
     @Override
@@ -52,7 +63,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//        navView.postDelayed(() -> {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_home) {
                 startActivity(new Intent(this, HomePage.class));
@@ -62,7 +72,22 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                 startActivity(new Intent(this, PetProfile.class));
             }
             finish();
-//        }, 300);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        switch(itemId) {
+            case R.id.export: {
+                // do something
+                return true;
+            }
+            default:
+                // do something
+            return super.onOptionsItemSelected(item);
+
+        }
+
     }
 }

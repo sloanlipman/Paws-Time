@@ -6,57 +6,46 @@
     android:layout_height="match_parent"
     tools:context=".PetProfile">
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/activity_main"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="16dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="40dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="60dp">
+            android:layout_marginTop="60dp"
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/petPicture"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:srcCompat="@tools:sample/avatars"
-                android:src="@mipmap/ic_launcher"/>
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher"
+                tools:srcCompat="@tools:sample/avatars" />
 
-            <LinearLayout
+            <EditText
+                android:id="@+id/petType"
+                android:layout_width="126dp"
+                android:layout_height="125dp"
+                android:layout_gravity="center"
+                android:ems="10"
+                android:hint="@string/pet_type"
+                android:inputType="textMultiLine" />
+
+            <EditText
+                android:id="@+id/petDesc"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/petType"
-                    android:layout_width="126dp"
-                    android:layout_height="125dp"
-                    android:ems="10"
-                    android:hint="@string/pet_type"
-                    android:inputType="textMultiLine" />
-
-                <EditText
-                    android:id="@+id/petDesc"
-                    android:layout_width="297dp"
-                    android:layout_height="125dp"
-                    android:ems="10"
-                    android:hint="@string/pet_description"
-                    android:inputType="textMultiLine"
-                    tools:layout_conversion_absoluteHeight="200dp"
-                    tools:layout_conversion_absoluteWidth="411dp" />
-            </LinearLayout>
+                android:layout_height="125dp"
+                android:ems="10"
+                android:hint="@string/pet_description"
+                android:inputType="textMultiLine"
+                tools:layout_conversion_absoluteHeight="200dp"
+                tools:layout_conversion_absoluteWidth="411dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -67,6 +56,7 @@
                     android:id="@+id/petCareInstr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
@@ -80,6 +70,7 @@
                     android:id="@+id/medicalInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="end"
                     android:ems="10"
                     android:hint="@string/medical_info"
                     android:inputType="textMultiLine" />
@@ -98,9 +89,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textMultiLine"
-                android:hint="@string/emergency_contact_info" />
+                android:hint="@string/emergency_contact_info"
+                android:inputType="textMultiLine" />
         </LinearLayout>
     </ScrollView>
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/activity_base"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

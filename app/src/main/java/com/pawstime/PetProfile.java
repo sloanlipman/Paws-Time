@@ -17,4 +17,5 @@ public class PetProfile extends BaseActivity {
     protected int getToolbarTitle() {
         return R.string.toolbar_profile;
     }
+
 }
