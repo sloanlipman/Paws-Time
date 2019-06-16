@@ -1,13 +1,14 @@
 package com.pawstime;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
-public class HomePage extends AppCompatActivity {
+public class HomePage extends BaseActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_page);
+    public int getContentViewId() {
+        return R.layout.home_page;
+    }
+
+    @Override
+    public int getNavigationMenuItemId() {
+        return R.id.navigation_home;
     }
 }

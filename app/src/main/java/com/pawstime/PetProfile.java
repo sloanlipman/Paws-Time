@@ -1,13 +1,14 @@
 package com.pawstime;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
-public class PetProfile extends AppCompatActivity {
+public class PetProfile extends BaseActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.pet_profile);
+    public int getContentViewId() {
+        return R.layout.pet_profile;
+    }
+
+    @Override
+    public int getNavigationMenuItemId() {
+        return R.id.navigation_viewPets;
     }
 }
