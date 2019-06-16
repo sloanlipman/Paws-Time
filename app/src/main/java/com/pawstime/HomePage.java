@@ -11,4 +11,9 @@ public class HomePage extends BaseActivity {
     public int getNavigationMenuItemId() {
         return R.id.navigation_home;
     }
+
+    @Override
+    protected int getToolbarTitle() {
+        return R.string.toolbar_home;
+    }
 }

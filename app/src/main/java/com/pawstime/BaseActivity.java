@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 
@@ -12,7 +13,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
     abstract int getContentViewId();
     abstract int getNavigationMenuItemId();
+    abstract int getToolbarTitle();
     BottomNavigationView navView;
+    Toolbar toolbar;
 
     private void updateNavigationBarState() {
         int actionId = this.getNavigationMenuItemId();
@@ -30,6 +33,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         setContentView(getContentViewId());
         navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(this);
+
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(getToolbarTitle());
     }
 
     @Override

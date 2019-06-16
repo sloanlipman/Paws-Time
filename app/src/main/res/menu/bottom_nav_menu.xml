@@ -9,7 +9,7 @@
     <item
         android:id="@+id/navigation_viewPets"
         android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/view_pets" />
+        android:title="@string/view_profile" />
 
     <item
         android:id="@+id/navigation_reminders"

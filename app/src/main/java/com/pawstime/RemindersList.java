@@ -3,7 +3,6 @@ package com.pawstime;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
-import android.view.View;
 
 public class RemindersList extends BaseActivity {
     FloatingActionButton addReminder;
@@ -15,6 +14,11 @@ public class RemindersList extends BaseActivity {
     @Override
     public int getNavigationMenuItemId() {
         return R.id.navigation_reminders;
+    }
+
+    @Override
+    protected int getToolbarTitle() {
+        return R.string.toolbar_reminders;
     }
 
     @Override

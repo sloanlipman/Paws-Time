@@ -2,10 +2,11 @@
     <string name="app_name">Paws Time</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="view_pets">View Pets</string>
+    <string name="toolbar_home">Home</string>
+    <string name="view_profile">View Profile</string>
+    <string name="toolbar_profile">Profile</string>
     <string name="reminders">Reminders</string>
+    <string name="toolbar_reminders">Reminders</string>
     <string name="pet_type">What kind of pet do you have?</string>
     <string name="pet_description">Pet Description</string>
     <string name="care_instructions">Care Instructions</string>

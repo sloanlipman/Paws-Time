@@ -12,4 +12,9 @@ public class PetProfile extends BaseActivity {
     public int getNavigationMenuItemId() {
         return R.id.navigation_viewPets;
     }
+
+    @Override
+    protected int getToolbarTitle() {
+        return R.string.toolbar_profile;
+    }
 }
