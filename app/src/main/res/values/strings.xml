@@ -7,7 +7,6 @@
     <string name="toolbar_profile">Profile</string>
     <string name="reminders">Reminders</string>
     <string name="toolbar_reminders">Reminders</string>
-    <string name="pet_type">What kind of pet do you have?</string>
     <string name="pet_description">Pet Description</string>
     <string name="care_instructions">Special Care Instructions</string>
     <string name="medical_info">Medical Info</string>
@@ -32,4 +31,26 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+
+
+    <string name="pet_type">What kind of pet do you have?</string>
+    <string name="pet_name_prompt">Pet Name</string>
+    <string name="the">the</string>
+
+    <string-array name="pet_type_array">
+        <item>[Select One]</item>
+        <item>Dog</item>
+        <item>Cat</item>
+        <item>Fish</item>
+        <item>Turtle</item>
+        <item>Guinea Pig</item>
+        <item>Bird</item>
+        <item>Rabbit</item>
+        <item>Lizard</item>
+        <item>Horse</item>
+        <item>Iguana</item>
+        <item>Ferret</item>
+        <item>Hamster</item>
+        <item>Rock</item>
+    </string-array>
 </resources>

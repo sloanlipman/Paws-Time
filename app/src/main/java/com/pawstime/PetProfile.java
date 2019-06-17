@@ -18,4 +18,9 @@ public class PetProfile extends BaseActivity {
         return R.string.toolbar_profile;
     }
 
+    // TODO give the user the option to add new pet types to the spinner
+    // See https://www.mkyong.com/android/android-spinner-drop-down-list-example/ for an example!
+
+    // TODO use an adapter so we can remove hardcoded "[Select One]" from strings.xml
+    // See https://stackoverflow.com/questions/867518/how-to-make-an-android-spinner-with-initial-text-select-one
 }
