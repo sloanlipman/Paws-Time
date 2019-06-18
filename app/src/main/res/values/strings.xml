@@ -36,6 +36,7 @@
     <string name="pet_type">What kind of pet do you have?</string>
     <string name="pet_name_prompt">Pet Name</string>
     <string name="the">the</string>
+    <string name="change_picture">Change Picture</string>
 
     <string-array name="pet_type_array">
         <item>[Select One]</item>
