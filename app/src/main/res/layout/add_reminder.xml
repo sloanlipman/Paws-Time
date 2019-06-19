@@ -13,7 +13,9 @@
         android:layout_marginBottom="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        tools:layout_editor_absoluteX="0dp">
 
         <EditText
             android:id="@+id/editText"
@@ -26,12 +28,26 @@
             android:ems="10"
             android:hint="@string/message"
             android:importantForAutofill="no"
+            android:inputType="textCapCharacters" />
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ems="10"
+            android:hint="@string/pet"
+            android:importantForAutofill="no"
             android:inputType="textPersonName" />
 
         <TimePicker
             android:id="@+id/alarmTimePicker"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:timePickerMode="spinner" />
 
     </LinearLayout>
 
