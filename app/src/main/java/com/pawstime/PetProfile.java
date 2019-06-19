@@ -1,11 +1,11 @@
 package com.pawstime;
 
-
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 
 public class PetProfile extends BaseActivity {
-
+    com.github.clans.fab.FloatingActionButton changePet;
     @Override
     public int getContentViewId() {
         return R.layout.pet_profile;
@@ -19,6 +19,16 @@ public class PetProfile extends BaseActivity {
     @Override
     protected int getToolbarTitle() {
         return R.string.toolbar_profile;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        changePet = findViewById(R.id.change_pet);
+        changePet.setOnClickListener(v -> {
+            DialogFragment newReminder = new SelectPet();
+            newReminder.show(getSupportFragmentManager(), "selectPet");
+        });
     }
 
     // TODO give the user the option to add new pet types to the spinner

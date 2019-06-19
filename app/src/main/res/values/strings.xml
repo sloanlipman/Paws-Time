@@ -43,6 +43,8 @@
     <string name="set_active">Set Active</string>
     <string name="save_changes">Save Changes</string>
     <string name="change_pet">Change Pet</string>
+    <string name="select_pet">Select Pet</string>
+    <string name="confirm">Confirm</string>
 
     <string-array name="pet_type_array">
         <item>[Select One]</item>
