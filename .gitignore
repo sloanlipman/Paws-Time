@@ -12,7 +12,11 @@
 bin/
 gen/
 out/
-
+.project
+.settings/
+app/.classpath
+app/.project
+app/.settings/
 # Gradle files
 .gradle/
 build/
@@ -64,3 +68,6 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+
+#ZIPs
+*.zip
