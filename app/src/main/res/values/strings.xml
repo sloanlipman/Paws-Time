@@ -45,6 +45,7 @@
     <string name="change_pet">Change Pet</string>
     <string name="select_pet">Select Pet</string>
     <string name="confirm">Confirm</string>
+    <string name="pet">Pet</string>
 
     <string-array name="pet_type_array">
         <item>[Select One]</item>
