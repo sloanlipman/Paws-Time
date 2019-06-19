@@ -12,7 +12,11 @@
 bin/
 gen/
 out/
-
+.project
+.settings/
+app/.classpath
+app/.project
+app/.settings/
 # Gradle files
 .gradle/
 build/
