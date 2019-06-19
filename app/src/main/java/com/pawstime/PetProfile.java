@@ -1,6 +1,9 @@
 package com.pawstime;
 
 
+import android.view.Menu;
+import android.view.MenuInflater;
+
 public class PetProfile extends BaseActivity {
 
     @Override

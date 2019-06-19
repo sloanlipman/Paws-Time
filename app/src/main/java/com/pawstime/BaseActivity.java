@@ -42,12 +42,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.overflow_menu, menu);
-        return true;
-    }
 
     @Override
     protected void onStart() {

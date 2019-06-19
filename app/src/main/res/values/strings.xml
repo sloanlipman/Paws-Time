@@ -15,7 +15,8 @@
     <string name="new_reminder_title">Create new Reminder</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
-    <string name="export_pet_details">Export Pet Details</string>
+    <string name="export_pet_details">Export Details</string>
+    <string name="add_new_pet">Add New Pet</string>
     <string name="options">Options</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -38,6 +39,10 @@
     <string name="the">the</string>
     <string name="change_picture">Change Picture</string>
     <string name="message">Message</string>
+    <string name="your_pets">Your Pets</string>
+    <string name="set_active">Set Active</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="change_pet">Change Pet</string>
 
     <string-array name="pet_type_array">
         <item>[Select One]</item>
