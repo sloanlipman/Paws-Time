@@ -21,4 +21,7 @@ public class AddReminder extends DialogFragment {
     // On passing events back to where the dialog was called from, see https://developer.android.com/guide/topics/ui/dialogs#PassingEvents
         return builder.create();
     }
+
+    //TODO Have date and time be selected in same picker
+    //https://www.tutorialspoint.com/android/android_datepicker_control.htm
 }
