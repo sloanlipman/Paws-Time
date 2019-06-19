@@ -37,18 +37,16 @@
         tools:srcCompat="@drawable/ic_paws_time" />
 
     <android.support.v7.widget.CardView
-        android:layout_width="308dp"
-        android:layout_height="263dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="52dp"
+        android:layout_width="match_parent"
+        android:layout_height="314dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/homeLogo"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.086">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -56,88 +54,86 @@
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:backgroundTint="#3F50B5">
 
                 <TextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/yourPet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:text="@string/your_pets"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <android.support.v7.widget.CardView
-                    android:id="@+id/cardView4"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="48dp"
-                    app:cardBackgroundColor="#00D80B0B"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/pet1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_launcher_round" />
+                        android:layout_marginTop="24dp"
+                        app:cardBackgroundColor="@color/design_default_color_primary"
+                        app:cardCornerRadius="0dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_launcher_round" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/pet_name_prompt" />
+
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/pet2"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/pet_name_prompt" />
+                        app:cardBackgroundColor="@color/design_default_color_primary"
+                        app:cardCornerRadius="0dp">
 
-                </android.support.v7.widget.CardView>
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@mipmap/ic_launcher_round" />
 
-                <android.support.v7.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:cardBackgroundColor="#00D80B0B"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cardView4">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/pet_name_prompt" />
 
-                    <ImageView
-                        android:layout_width="wrap_content"
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/pet3"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@mipmap/ic_launcher_round" />
+                        app:cardBackgroundColor="@color/design_default_color_primary"
+                        app:cardCornerRadius="0dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/pet_name_prompt" />
+                        <ImageView
+                            android:id="@+id/imageView2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@mipmap/ic_launcher_round" />
 
-                </android.support.v7.widget.CardView>
+                        <TextView
+                            android:id="@+id/textView3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/pet_name_prompt" />
 
-                <android.support.v7.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="200dp"
-                    app:cardBackgroundColor="#00D80B0B"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <ImageView
-                        android:id="@+id/imageView2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@mipmap/ic_launcher_round" />
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/pet_name_prompt" />
-
-                </android.support.v7.widget.CardView>
+                    </android.support.v7.widget.CardView>
+                </LinearLayout>
 
             </android.support.constraint.ConstraintLayout>
         </ScrollView>
@@ -145,6 +141,10 @@
 
     <include
         android:id="@+id/include"
-        layout="@layout/activity_base" />
+        layout="@layout/activity_base"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

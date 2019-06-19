@@ -239,7 +239,7 @@
         fab:menu_colorRipple="#99FFFFFF"
         fab:menu_fab_label=""
         fab:menu_fab_size="normal"
-        fab:menu_icon="@drawable/ic_dashboard_black_24dp"
+        fab:menu_icon="@drawable/baseline_view_list_black_18dp"
         fab:menu_labels_colorNormal="#333333"
         fab:menu_labels_colorPressed="#444444"
         fab:menu_labels_colorRipple="#66FFFFFF"
