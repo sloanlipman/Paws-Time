@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.pawstime.R;
 import com.pawstime.dialogs.SelectPet;
@@ -30,9 +31,9 @@ public class PetProfile extends BaseActivity {
     com.github.clans.fab.FloatingActionButton addPet, changePet, export, save;
     ImageView picture;
     Button changePicture;
-    EditText name, description, careInstructions, medicalInfo, preferredVet, emergencyContact;
-    Spinner petType;
-    private String currentPetName;
+    EditText description, careInstructions, medicalInfo, preferredVet, emergencyContact;
+    TextView petNameAndType;
+
     @Override
     public int getContentViewId() {
         return R.layout.pet_profile;
@@ -71,33 +72,20 @@ public class PetProfile extends BaseActivity {
 
         picture = findViewById(R.id.petPicture);
         changePicture = findViewById(R.id.changePicture);
-        name = findViewById(R.id.petName);
-        name.setOnFocusChangeListener((v, hasFocus) -> Pet.setCurrentPetName(name.getText().toString()));
         description = findViewById(R.id.petDesc);
         careInstructions = findViewById(R.id.careInstructions);
         medicalInfo = findViewById(R.id.medicalInfo);
         preferredVet = findViewById(R.id.preferredVetName);
         emergencyContact = findViewById(R.id.emergencyContactInfo);
-
-        petType = findViewById(R.id.petType);
-        petType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Pet.setCurrentPettype(parent.getItemAtPosition(position).toString());
-                System.out.println("Pet type is " + Pet.getCurrentPetType());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        petNameAndType = findViewById(R.id.petNameAndType);
+        String pet = Pet.getCurrentPetName() + " the " + Pet.getCurrentPetType();
+        petNameAndType.setText(pet);
     }
 
     void savePetToFile() {
     // Read values from the UI
         ArrayMap<String, String> map = new ArrayMap<>();
-        map.put("name", name.getText().toString());
+        map.put("name", Pet.getCurrentPetName());
         map.put("description", description.getText().toString());
         map.put("careInstructions", careInstructions.getText().toString());
         map.put("medicalInfo", medicalInfo.getText().toString());
@@ -143,13 +131,11 @@ public class PetProfile extends BaseActivity {
             json = (JSONObject) new JSONTokener(jsonString).nextValue(); // Turn the String into JSON
 
         // Set the values on the UI
-            getJson(json, "name", name);
             getJson(json, "description", description);
             getJson(json, "careInstructions", careInstructions);
             getJson(json, "medicalInfo", medicalInfo);
             getJson(json, "preferredVet", preferredVet);
             getJson(json, "emergencyContact", emergencyContact);
-            // TODO set pet type through the adapter
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -163,11 +149,4 @@ public class PetProfile extends BaseActivity {
             e.printStackTrace();
         }
     }
-
-
-    // TODO give the user the option to add new pet types to the spinner
-    // See https://www.mkyong.com/android/android-spinner-drop-down-list-example/ for an example!
-
-    // TODO use an adapter so we can remove hardcoded "[Select One]" from strings.xml
-    // See https://stackoverflow.com/questions/867518/how-to-make-an-android-spinner-with-initial-text-select-one
 }

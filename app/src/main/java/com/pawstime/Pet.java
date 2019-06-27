@@ -12,7 +12,7 @@ public class Pet {
         return currentPetName;
     }
 
-    public static void setCurrentPettype(String type) {
+    public static void setCurrentPetType(String type) {
         currentPetType = type;
     }
 
