@@ -1,8 +1,11 @@
-package com.pawstime;
+package com.pawstime.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
+
+import com.pawstime.dialogs.AddReminder;
+import com.pawstime.R;
 
 public class RemindersList extends BaseActivity {
     FloatingActionButton addReminder;

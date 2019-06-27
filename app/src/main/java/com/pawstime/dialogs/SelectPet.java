@@ -1,10 +1,12 @@
-package com.pawstime;
+package com.pawstime.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
+
+import com.pawstime.R;
 
 public class SelectPet extends DialogFragment {
     @NonNull

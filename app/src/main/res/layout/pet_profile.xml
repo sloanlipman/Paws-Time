@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    tools:context=".PetProfile">
+    tools:context=".activities.PetProfile">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -35,8 +35,8 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/button"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/changePicture"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="130dp"
@@ -49,44 +49,18 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/petName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="@string/pet_name_prompt"
-                    android:inputType="textPersonName" />
-
                 <TextView
-                    android:id="@+id/the"
-                    android:layout_width="3dp"
+                    android:id="@+id/petNameAndType"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_weight="1"
                     android:ems="10"
                     android:gravity="center"
                     android:text="@string/the"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-                <Spinner
-                    android:id="@+id/petType"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="end"
-                    android:dropDownWidth="wrap_content"
-                    android:entries="@array/pet_type_array"
-                    android:gravity="end"
-                    android:prompt="@string/pet_type"
-                    android:spinnerMode="dialog" />
             </LinearLayout>
 
             <EditText
@@ -267,7 +241,7 @@
         fab:menu_showShadow="true">
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/add_pet"
+            android:id="@+id/addPet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/fab_add"
@@ -275,7 +249,7 @@
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/change_pet"
+            android:id="@+id/changePet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_swap_horizontal_circle_black_18dp"
