@@ -12,9 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".RemindersList" />
-        <activity android:name=".PetProfile" />
-        <activity android:name=".HomePage">
+        <activity android:name=".activities.RemindersList" />
+        <activity android:name=".activities.PetProfile" />
+        <activity android:name=".activities.HomePage">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

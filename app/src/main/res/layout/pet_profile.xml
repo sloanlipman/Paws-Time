@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    tools:context=".PetProfile">
+    tools:context=".activities.PetProfile">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/button"
+                    android:id="@+id/changePicture"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -267,7 +267,7 @@
         fab:menu_showShadow="true">
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/add_pet"
+            android:id="@+id/addPet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/fab_add"
@@ -275,7 +275,7 @@
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/change_pet"
+            android:id="@+id/changePet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_swap_horizontal_circle_black_18dp"

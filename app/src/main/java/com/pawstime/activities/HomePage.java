@@ -1,7 +1,10 @@
-package com.pawstime;
+package com.pawstime.activities;
 
 import android.os.Bundle;
 import android.widget.ImageView;
+
+import com.pawstime.R;
+
 
 public class HomePage extends BaseActivity {
     ImageView homeLogo;
@@ -29,6 +32,5 @@ public class HomePage extends BaseActivity {
         String imagePath = "drawable/ic_paws_time";
         int imageKey = this.getApplicationContext().getResources().getIdentifier(imagePath, "drawable", "com.pawstime"); // Find the image key
         homeLogo.setImageDrawable(this.getApplicationContext().getResources().getDrawable(imageKey)); // Set the image
-
     }
 }
