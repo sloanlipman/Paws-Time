@@ -1,16 +1,16 @@
 package com.pawstime.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.ArrayMap;
-import android.view.View;
-import android.widget.AdapterView;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pawstime.R;
 import com.pawstime.dialogs.SelectPet;
@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 */
 public class PetProfile extends BaseActivity {
     com.github.clans.fab.FloatingActionButton addPet, changePet, export, save;
+    com.github.clans.fab.FloatingActionMenu fabMenu;
     ImageView picture;
     Button changePicture;
     EditText description, careInstructions, medicalInfo, preferredVet, emergencyContact;
@@ -57,6 +58,57 @@ public class PetProfile extends BaseActivity {
     }
 
     void initializeUI() {
+
+        fabMenu = findViewById(R.id.fab_menu);
+        fabMenu.setClosedOnTouchOutside(true); // Dismiss by tapping anywhere
+
+    // Behavior for when toggling the FAB menu
+        fabMenu.setOnMenuToggleListener(v -> {
+            if(getCurrentFocus() != null) {
+                int id = getCurrentFocus().getId(); // Finds the ID of the currently focused View
+                EditText selected = null;
+
+            // Compare to EditText fields
+                switch (id) {
+                    case R.id.petDesc: {
+                        selected = description;
+                        break;
+                    }
+
+                    case R.id.careInstructions: {
+                        selected = careInstructions;
+                        break;
+                    }
+
+                    case R.id.medicalInfo: {
+                        selected = medicalInfo;
+                        break;
+                    }
+
+                    case R.id.preferredVetName: {
+                        selected = preferredVet;
+                        break;
+                    }
+
+                    case R.id.emergencyContactInfo: {
+                        selected = emergencyContact;
+                        break;
+                    }
+                    default: {
+                        Log.e("FAB Menu", "Either nothing is selected, or there EditText isn't specified in this code block"); // If we see this message and there was something selected, we need to add a new case
+                    }
+                }
+
+                if (!fabMenu.isOpened() && selected != null) {
+                    selected.setCursorVisible(true);
+                } else if (fabMenu.isOpened() && selected != null) {
+                    selected.setCursorVisible(false);
+                } else {
+                    Log.e("FAB Menu", "The EditText you're looking for isn't specified in this code block"); // Again, we're missing a case
+                }
+            }
+        });
+
         changePet = findViewById(R.id.changePet);
         changePet.setOnClickListener(v -> {
             DialogFragment newReminder = new SelectPet();
@@ -68,6 +120,7 @@ public class PetProfile extends BaseActivity {
 
         addPet = findViewById(R.id.addPet);
         export = findViewById(R.id.export);
+        export.setOnClickListener(v -> exportPet());
 
 
         picture = findViewById(R.id.petPicture);
@@ -81,6 +134,7 @@ public class PetProfile extends BaseActivity {
         String pet = Pet.getCurrentPetName() + " the " + Pet.getCurrentPetType();
         petNameAndType.setText(pet);
     }
+
 
     void savePetToFile() {
     // Read values from the UI
@@ -105,8 +159,10 @@ public class PetProfile extends BaseActivity {
             outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
             outputStream.write(json.toString().getBytes());
             outputStream.close(); // Don't forget to close the stream!
+            Toast.makeText(this, "Pet successfully saved!", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -141,6 +197,52 @@ public class PetProfile extends BaseActivity {
             e.printStackTrace();
         }
     }
+
+    private void exportPet() {
+        savePetToFile(); // Save the pet first
+
+        String nameAndType;
+        String desc = "";
+        String care = "";
+        String medical = "";
+        String vet = "";
+        String contact = "";
+
+        if (petNameAndType.length() > 0) {
+            nameAndType = petNameAndType.getText().toString(); // Make sure there is a name and description
+
+        // Parse the UI fields
+            if (description.getText().length() > 0) {
+                desc = description.getText().toString() + "\n\n";
+            }
+
+            if (careInstructions.getText().length() > 0) {
+                care = "Special care instructions:\n" + careInstructions.getText().toString() + "\n\n";
+            }
+
+            if (medicalInfo.getText().length() > 0) {
+                medical = "Medical info:\n" + medicalInfo.getText().toString() + "\n\n";
+            }
+
+            if (preferredVet.getText().length() > 0) {
+                vet = "Our favorite vet:\n" + preferredVet.getText().toString() + "\n\n";
+            }
+
+            if (emergencyContact.getText().length() > 0) {
+                contact = "In case of emergency, please contact:\n" + emergencyContact.getText().toString();
+            }
+
+            String message = "I'm using PawsTime to help keep track of my pets! Here is some information about " + nameAndType + "!\n\n"  + desc + care + medical + vet + contact;
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Check out my pet!");
+            intent.putExtra(Intent.EXTRA_TEXT, message);
+            intent.setType("text/plain");
+            startActivity(Intent.createChooser(intent, getResources().getText(R.string.export_pet_details)));
+        } else {
+            Toast.makeText(this, "Something went wrong. Please save your changes and then try again", Toast.LENGTH_SHORT).show(); // For whatever reason if there's no pet name and type, show an error
+        }
+    }
+
 
     void getJson(JSONObject json, String string, EditText editText) {
         try {
