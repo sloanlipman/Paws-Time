@@ -15,10 +15,8 @@
         <activity android:name=".activities.RemindersList" />
         <activity android:name=".activities.PetProfile" />
         <activity android:name=".activities.HomePage">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
