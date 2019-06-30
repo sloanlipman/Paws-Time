@@ -35,7 +35,7 @@
 
 
     <string name="pet_type">What kind of pet do you have?</string>
-    <string name="pet_name_prompt">Pet Name</string>
+    <string name="pet_name_prompt">What is your pet\'s name?</string>
     <string name="the">the</string>
     <string name="change_picture">Change Picture</string>
     <string name="message">Message</string>
@@ -46,21 +46,4 @@
     <string name="select_pet">Select Pet</string>
     <string name="confirm">Confirm</string>
     <string name="pet">Pet</string>
-
-    <string-array name="pet_type_array">
-        <item>[Select One]</item>
-        <item>Dog</item>
-        <item>Cat</item>
-        <item>Fish</item>
-        <item>Turtle</item>
-        <item>Guinea Pig</item>
-        <item>Bird</item>
-        <item>Rabbit</item>
-        <item>Lizard</item>
-        <item>Horse</item>
-        <item>Iguana</item>
-        <item>Ferret</item>
-        <item>Hamster</item>
-        <item>Rock</item>
-    </string-array>
 </resources>
