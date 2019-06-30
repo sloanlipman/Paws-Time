@@ -7,8 +7,20 @@ import android.support.v4.app.DialogFragment;
 import com.pawstime.dialogs.AddReminder;
 import com.pawstime.R;
 
-public class RemindersList extends BaseActivity {
+public class RemindersList extends BaseActivity implements AddReminder.AddReminderListener {
     FloatingActionButton addReminder;
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        startActivity(getIntent());
+        finish();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }
+
     @Override
     public int getContentViewId() {
         return R.layout.reminders_list;
@@ -34,5 +46,7 @@ public class RemindersList extends BaseActivity {
             newReminder.show(getSupportFragmentManager(), "newReminder");
         });
     }
+
+
 
 }
