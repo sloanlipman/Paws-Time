@@ -3,7 +3,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_home">Home</string>
     <string name="toolbar_home">Home</string>
-    <string name="view_profile">View Profile</string>
+    <string name="view_profile">Profile</string>
     <string name="toolbar_profile">Profile</string>
     <string name="reminders">Reminders</string>
     <string name="toolbar_reminders">Reminders</string>
