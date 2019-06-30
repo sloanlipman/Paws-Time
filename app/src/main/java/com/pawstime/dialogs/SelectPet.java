@@ -6,18 +6,17 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.pawstime.Pet;
 import com.pawstime.R;
+import com.pawstime.activities.BaseActivity;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 
 public class SelectPet extends DialogFragment {
@@ -54,7 +53,7 @@ public class SelectPet extends DialogFragment {
         inflater = requireActivity().getLayoutInflater();
         rootView = inflater.inflate(R.layout.select_pet, null);
         radioGroup = rootView.findViewById(R.id.selectPetsRadioGroup);
-        ArrayList<String> listOfPets = getPets(rootView.getContext());
+        ArrayList<String> listOfPets = BaseActivity.getPetsList(rootView.getContext());
         addPets(listOfPets, rootView.getContext());
         inflater.inflate(R.layout.select_pet, radioGroup, true);
 
@@ -63,9 +62,7 @@ public class SelectPet extends DialogFragment {
 
         builder.setMessage(R.string.select_pet)
                     .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                        selectPet();
                         listener.onSelectPetDialogPositiveClick(SelectPet.this);
-
                     });
         builder.setNeutralButton(R.string.add_new_pet, (dialog, which) -> listener.onSelectPetDialogNeutralClick(SelectPet.this));
         if (!rootView.getContext().toString().contains("HomePage")) {
@@ -74,33 +71,20 @@ public class SelectPet extends DialogFragment {
                 listener.onSelectPetDialogNegativeClick(SelectPet.this);
             });
         }
-        return builder.create();
-    }
-
-    ArrayList<String> getPets(Context context) {
-        FileReader fr;
-        BufferedReader reader;
-        String stream;
-        ArrayList<String> petList = new ArrayList<>();
-        File directory = context.getFilesDir();
-        File profile = new File(directory, "profile");
-
-        try {
-            fr = new FileReader(profile);
-            reader = new BufferedReader(fr);
-            while((stream = reader.readLine()) != null) {
-                String[] pets = stream.split(",");
-                for (String pet: pets) {
-                    System.out.println(pet);
-                    petList.add(pet);
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialog1 -> {
+            Button b = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            b.setOnClickListener(v -> {
+                if (selectPet()) {
+                    dismiss();
+                } else {
+                    Toast.makeText(rootView.getContext(), "Please select a pet or add a new one!", Toast.LENGTH_SHORT).show();
                 }
-            }
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return petList;
+            });
+        });
+       return dialog;
     }
+
 
     void addPets(ArrayList<String> listOfPets, Context context) {
         String currentPet = Pet.getCurrentPetName();
@@ -108,8 +92,6 @@ public class SelectPet extends DialogFragment {
             RadioButton rb = new RadioButton(context);
             rb.setId(i);
             rb.setText(listOfPets.get(i));
-            Log.d("Profile", rb.getText().toString());
-            System.out.println("Profile " + rb.getText().toString().equals(currentPet));
             radioGroup.addView(rb);
             if (rb.getText().toString().equals(currentPet)) {
                 rb.toggle();
@@ -117,9 +99,16 @@ public class SelectPet extends DialogFragment {
         }
     }
 
-   void selectPet() {
-        int selectedId = radioGroup.getCheckedRadioButtonId();
-        RadioButton selectedPet = rootView.findViewById(selectedId);
-        Pet.setCurrentPetName(selectedPet.getText().toString());
+   public boolean selectPet() {
+        if(radioGroup.getCheckedRadioButtonId() != -1) {
+            System.out.println("Checked ID is " + radioGroup.getCheckedRadioButtonId());
+            int selectedId = radioGroup.getCheckedRadioButtonId();
+            RadioButton selectedPet = rootView.findViewById(selectedId);
+            Pet.setCurrentPetName(selectedPet.getText().toString());
+            return true;
+        } else {
+            System.out.println("Going to return false");
+            return false;
+        }
     }
 }

@@ -119,7 +119,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     }
 
     public void initializeFabMenu() {
-        fabMenu = findViewById(R.id.fab_menu);
+        fabMenu = findViewById(R.id.fabMenu);
         fabMenu.setClosedOnTouchOutside(true); // Dismiss by tapping anywhere
 
     /* Behavior for when toggling the FAB menu */
