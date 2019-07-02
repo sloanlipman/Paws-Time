@@ -26,7 +26,6 @@ public class SelectPet extends DialogFragment {
 
     public interface SelectPetDialogListener {
         void onSelectPetDialogPositiveClick(DialogFragment dialog);
-        void onSelectPetDialogNegativeClick(DialogFragment dialog);
         void onSelectPetDialogNeutralClick(DialogFragment dialog);
     }
 
@@ -55,26 +54,22 @@ public class SelectPet extends DialogFragment {
         radioGroup = rootView.findViewById(R.id.selectPetsRadioGroup);
         ArrayList<String> listOfPets = BaseActivity.getPetsList(rootView.getContext());
         addPets(listOfPets, rootView.getContext());
-        inflater.inflate(R.layout.select_pet, radioGroup, true);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(rootView);
 
         builder.setMessage(R.string.select_pet)
-                    .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                        listener.onSelectPetDialogPositiveClick(SelectPet.this);
-                    });
+                    .setPositiveButton(R.string.confirm, (dialog, which) -> {});
         builder.setNeutralButton(R.string.add_new_pet, (dialog, which) -> listener.onSelectPetDialogNeutralClick(SelectPet.this));
-        if (!rootView.getContext().toString().contains("HomePage")) {
-            builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
-                // Cancel
-                listener.onSelectPetDialogNegativeClick(SelectPet.this);
-            });
+
+        if (!rootView.getContext().toString().contains("HomePage")) { // Only show the Add Pet button on Home Page
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> {});
         }
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(dialog1 -> {
-            Button b = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            b.setOnClickListener(v -> {
+            Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positive.setOnClickListener(v -> {
+                listener.onSelectPetDialogPositiveClick(SelectPet.this);
                 if (selectPet()) {
                     dismiss();
                 } else {
@@ -84,7 +79,6 @@ public class SelectPet extends DialogFragment {
         });
        return dialog;
     }
-
 
     void addPets(ArrayList<String> listOfPets, Context context) {
         String currentPet = Pet.getCurrentPetName();
@@ -101,14 +95,11 @@ public class SelectPet extends DialogFragment {
 
    public boolean selectPet() {
         if(radioGroup.getCheckedRadioButtonId() != -1) {
-            System.out.println("Checked ID is " + radioGroup.getCheckedRadioButtonId());
             int selectedId = radioGroup.getCheckedRadioButtonId();
             RadioButton selectedPet = rootView.findViewById(selectedId);
             Pet.setCurrentPetName(selectedPet.getText().toString());
             return true;
-        } else {
-            System.out.println("Going to return false");
-            return false;
         }
+        return false;
     }
 }

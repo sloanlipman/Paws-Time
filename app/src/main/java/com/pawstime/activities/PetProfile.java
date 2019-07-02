@@ -30,6 +30,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     Button changePicture;
     EditText description, careInstructions, medicalInfo, preferredVet, emergencyContact;
     TextView petNameAndType;
+
     @Override
     public int getContentViewId() {
         return R.layout.pet_profile;
@@ -48,14 +49,9 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
 // Add pet listeners
     @Override
     public void onAddPetDialogPositiveClick(DialogFragment dialog) {
-        fabMenu.close(true);
+       fabMenu.close(true);
         startActivity(getIntent());
         finish();
-    }
-
-    @Override
-    public void onAddPetDialogNegativeClick(DialogFragment dialog) {
-        fabMenu.close(true);
     }
 
 // Selecting pet listeners
@@ -67,11 +63,6 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     }
 
     @Override
-    public void onSelectPetDialogNegativeClick(DialogFragment dialog) {
-        fabMenu.close(true);
-    }
-
-    @Override
     public void onSelectPetDialogNeutralClick(DialogFragment dialog) {
         fabMenu.close(true);
         openAddPetDialog();
@@ -80,14 +71,12 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("Profile", "Created");
         initializeUI();
         loadPet();
     }
 
     public void loadPet() {
         String jsonString = BaseActivity.loadPetFile(this);
-        Log.d("Profile", jsonString);
         setPetProfileUI(jsonString);
     }
 
@@ -104,7 +93,6 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
 
         export = findViewById(R.id.export);
         export.setOnClickListener(v -> exportPet());
-
 
         picture = findViewById(R.id.petPicture);
         changePicture = findViewById(R.id.changePicture);
@@ -191,6 +179,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             outputStream.write(json.toString().getBytes());
             outputStream.close(); // Don't forget to close the stream!
             Toast.makeText(this, "Pet successfully saved!", Toast.LENGTH_SHORT).show();
+            fabMenu.close(true);
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
