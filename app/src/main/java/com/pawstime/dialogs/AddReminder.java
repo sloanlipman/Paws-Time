@@ -6,10 +6,22 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.pawstime.R;
 
 public class AddReminder extends DialogFragment {
+
+    private EditText reminderText;
+    private CheckBox alarmSelect;
+    private Spinner repeatSelectSpinner;
+    private Spinner petSelectSpinner;
+    private Button selectDateButton;
+    private Button selectTimeButton;
 
     public interface AddReminderListener {
         void onDialogPositiveClick(DialogFragment dialog);
@@ -47,6 +59,14 @@ public class AddReminder extends DialogFragment {
                 }).setView(R.layout.add_reminder);
     // On passing events back to where the dialog was called from, see https://developer.android.com/guide/topics/ui/dialogs#PassingEvents
         return builder.create();
+    }
+
+    public void onDateClick(View view) {
+
+    }
+
+    public void onTimeClick(View view) {
+
     }
 
     //TODO Have date and time be selected in same picker

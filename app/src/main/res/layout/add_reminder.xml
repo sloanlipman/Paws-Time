@@ -18,7 +18,7 @@
         tools:layout_editor_absoluteX="0dp">
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/reminderText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -30,24 +30,54 @@
             android:importantForAutofill="no"
             android:inputType="textCapCharacters" />
 
-        <EditText
-            android:id="@+id/editText2"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:ems="10"
-            android:hint="@string/pet"
-            android:importantForAutofill="no"
-            android:inputType="textPersonName" />
+            android:orientation="horizontal">
 
-        <TimePicker
-            android:id="@+id/alarmTimePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:timePickerMode="spinner" />
+            <CheckBox
+                android:id="@+id/alarmSelect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/alarm_checkbox_text" />
+
+            <Spinner
+                android:id="@+id/repeatSelectSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/petSelectSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/dateButton"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:onClick="onDateClick"/>
+
+            <Button
+                android:id="@+id/timeButton"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:onClick="onTimeClick"/>
+        </LinearLayout>
 
     </LinearLayout>
 
