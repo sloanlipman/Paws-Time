@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public abstract class BaseActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -30,7 +31,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
     BottomNavigationView navView;
     Toolbar toolbar;
-    public static String petToAdd;
 
     private void updateNavigationBarState() {
         int actionId = this.getNavigationMenuItemId();
@@ -109,10 +109,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             reader = new BufferedReader(fr);
             while((stream = reader.readLine()) != null) {
                 String[] pets = stream.split(",");
-                for (String pet: pets) {
-                    System.out.println(pet);
-                    petList.add(pet);
-                }
+                petList.addAll(Arrays.asList(pets));
             }
             reader.close();
         } catch (Exception e) {

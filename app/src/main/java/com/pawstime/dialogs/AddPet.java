@@ -15,8 +15,6 @@ import android.widget.Toast;
 
 import com.pawstime.Pet;
 import com.pawstime.R;
-import com.pawstime.activities.HomePage;
-import com.pawstime.activities.PetProfile;
 
 import org.json.JSONObject;
 
@@ -33,16 +31,14 @@ public class AddPet extends DialogFragment{
     EditText name;
     EditText type;
 
-
     public interface AddPetDialogListener {
         void onAddPetDialogPositiveClick(DialogFragment dialog);
-        void onAddPetDialogNegativeClick(DialogFragment dialog);
     }
 
     // Use this instance of the interface to deliver action events
     AddPetDialogListener listener;
 
-    // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
+    // Override the Fragment.onAttach() method to instantiate the AddPetDialogListener
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -58,6 +54,7 @@ public class AddPet extends DialogFragment{
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         inflater = requireActivity().getLayoutInflater();
         rootView = inflater.inflate(R.layout.add_pet, null);
@@ -67,35 +64,37 @@ public class AddPet extends DialogFragment{
         builder.setMessage(R.string.add_new_pet);
         builder.setView(rootView);
 
-        builder.setPositiveButton(R.string.save, (dialog, which) -> System.out.println("Positive button"));
+        builder.setPositiveButton(R.string.save, (dialog, which) -> {});
         if (!rootView.getContext().toString().contains("HomePage")) {
-            builder.setNegativeButton(R.string.cancel, (dialog, which) -> listener.onAddPetDialogNegativeClick(AddPet.this));
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> {});
         }
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(dialog1 -> {
 
-            Button b = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            b.setOnClickListener(v -> {
-                listener.onAddPetDialogPositiveClick(AddPet.this);
-                if (name.getText().toString().length() > 0 && type.getText().toString().length() > 0 ) {
-                    save(name.getText().toString(), type.getText().toString(), rootView.getContext());
-//                    HomePage.populatePetList(rootView.getContext());
-                    dismiss();
+        AlertDialog dialog = builder.create(); // Create the dialog
+//        dialog.show(); // Show the dialog
+
+    // Override the Save button
+        dialog.setOnShowListener(dialog1 -> {
+            Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positive.setOnClickListener(v -> {
+                if (name.getText().toString().length() > 0 && type.getText().toString().length() > 0) {
+                    if (save(name.getText().toString(), type.getText().toString(), rootView.getContext())) {
+                        listener.onAddPetDialogPositiveClick(AddPet.this); // Put the listener right where we want the actions to be occurring
+                    }
                 } else {
-                    Toast.makeText(rootView.getContext(), "Please provide a name and type and try again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(rootView.getContext(), "Please complete all fields and try again", Toast.LENGTH_SHORT).show();
                 }
             });
         });
-        return dialog;    }
+        return dialog;
+    }
 
-    public static void save(String name, String type, Context context) {
+    public boolean save(String name, String type, Context context) {
         FileOutputStream outputStream;
         File directory = context.getFilesDir();
         File profile = new File(directory, "profile");
         ArrayList<String> petList = getPetList(profile);
 
         if (!profile.exists()) {
-            System.out.println("File doesn't exist");
             try {
                 outputStream = context.openFileOutput("profile", Context.MODE_PRIVATE);
                 outputStream.write("".getBytes());
@@ -103,8 +102,6 @@ public class AddPet extends DialogFragment{
                 e.printStackTrace();
             }
         }
-
-
 
     // If pet is a new pet
         if (!petList.contains(name)) {
@@ -114,11 +111,9 @@ public class AddPet extends DialogFragment{
             JSONObject json = new JSONObject(map);
 
             try {
-                System.out.println("Writing " + json.toString());
                 outputStream = context.openFileOutput(name, Context.MODE_PRIVATE);
                 outputStream.write(json.toString().getBytes());
                 outputStream.close(); // Don't forget to close the stream!
-
                 Toast.makeText(context, "Pet successfully added!", Toast.LENGTH_SHORT).show();
 
             // If added, write to list of files
@@ -131,25 +126,26 @@ public class AddPet extends DialogFragment{
                     }
 
                     String petsToWrite = new String(pets);
-                    System.out.println("Writing " + petsToWrite);
 
                     outputStream = context.openFileOutput("profile", Context.MODE_PRIVATE);
                     outputStream.write(petsToWrite.getBytes()); // Write previous pets
                     outputStream.write((name + ",").getBytes()); // Append new pet's name and a separator (comma)
                     outputStream.close();
+                    Pet.setCurrentPetName(name);
+                    Pet.setCurrentPetType(type);
+                    return true;
                 } catch (Exception e) {
                     e.printStackTrace();
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(context, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
             }
-            Pet.setCurrentPetName(name);
-            Pet.setCurrentPetType(type);
-
         } else {
             Toast.makeText(context, "A pet with this name already exists! Please enter a unique name", Toast.LENGTH_SHORT).show();
         }
+        return false;
     }
 
     public static ArrayList<String> getPetList(File file) {
@@ -164,7 +160,6 @@ public class AddPet extends DialogFragment{
             while ((stream = reader.readLine()) != null) {
                 String[] pets = stream.split(",");
                 for (String pet : pets) {
-                    System.out.println(pet);
                     petList.add(pet);
                 }
             }

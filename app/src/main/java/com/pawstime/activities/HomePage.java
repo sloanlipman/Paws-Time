@@ -1,12 +1,9 @@
 package com.pawstime.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -28,27 +25,18 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
 
     @Override
     public void onAddPetDialogPositiveClick(DialogFragment dialog) {
-        Intent i = new Intent(getBaseContext(), PetProfile.class);
-        startActivity(i);
-        System.out.println("After populating");
-//        startActivity(getIntent());
-        finish(); // TODO see if adding this closes the app or not
-
-    }
-
-    @Override
-    public void onAddPetDialogNegativeClick(DialogFragment dialog) {
-        System.out.println("Clicked negative");
+            Intent i = new Intent(this, PetProfile.class);
+            startActivity(i);
+            finish();
     }
 
     @Override
     public void onSelectPetDialogPositiveClick(DialogFragment dialog) {}
 
     @Override
-    public void onSelectPetDialogNegativeClick(DialogFragment dialog) {}
-
-    @Override
-    public void onSelectPetDialogNeutralClick(DialogFragment dialog) {}
+    public void onSelectPetDialogNeutralClick(DialogFragment dialog) {
+        openAddPetDialog();
+    }
 
     @Override
     public int getContentViewId() {
@@ -100,14 +88,12 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
     public void populatePetList() {
         LinearLayout petList = findViewById(R.id.petList);
 
-        System.out.println("Populating pet list");
         ArrayList<String> listOfPets = getPetsList(this);
 
         for (int i = 0; i < listOfPets.size(); i++) {
             PetCardView cardView = new PetCardView(this);
             cardView.setName(listOfPets.get(i));
 //            cardView.setPicture();
-            System.out.println("Inflated " + cardView.name.getText().toString());
             petList.addView(cardView);
         }
 
