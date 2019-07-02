@@ -9,11 +9,13 @@ import android.support.v4.app.DialogFragment;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.pawstime.Pet;
 import com.pawstime.R;
+import com.pawstime.activities.HomePage;
 import com.pawstime.activities.PetProfile;
 
 import org.json.JSONObject;
@@ -26,6 +28,12 @@ import java.io.FileReader;
 import java.util.ArrayList;
 
 public class AddPet extends DialogFragment{
+    public View rootView;
+    public LayoutInflater inflater;
+    EditText name;
+    EditText type;
+
+
     public interface AddPetDialogListener {
         void onAddPetDialogPositiveClick(DialogFragment dialog);
         void onAddPetDialogNegativeClick(DialogFragment dialog);
@@ -51,30 +59,36 @@ public class AddPet extends DialogFragment{
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View v = inflater.inflate(R.layout.add_pet, null);
-        EditText name = v.findViewById(R.id.newPetName);
-        EditText type = v.findViewById(R.id.newPetType);
+        inflater = requireActivity().getLayoutInflater();
+        rootView = inflater.inflate(R.layout.add_pet, null);
+        name = rootView.findViewById(R.id.newPetName);
+        type = rootView.findViewById(R.id.newPetType);
 
         builder.setMessage(R.string.add_new_pet);
-        builder.setView(v);
+        builder.setView(rootView);
 
-        builder.setPositiveButton(R.string.save, (dialog, which) -> {
-            listener.onAddPetDialogPositiveClick(AddPet.this);
-            save(name.getText().toString(), type.getText().toString(), v.getContext());
-        });
-        if (!v.getContext().toString().contains("HomePage")) {
-            builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
-                listener.onAddPetDialogNegativeClick(AddPet.this);
-
-            });
+        builder.setPositiveButton(R.string.save, (dialog, which) -> System.out.println("Positive button"));
+        if (!rootView.getContext().toString().contains("HomePage")) {
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> listener.onAddPetDialogNegativeClick(AddPet.this));
         }
-        return builder.create();
-    }
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialog1 -> {
+
+            Button b = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            b.setOnClickListener(v -> {
+                listener.onAddPetDialogPositiveClick(AddPet.this);
+                if (name.getText().toString().length() > 0 && type.getText().toString().length() > 0 ) {
+                    save(name.getText().toString(), type.getText().toString(), rootView.getContext());
+//                    HomePage.populatePetList(rootView.getContext());
+                    dismiss();
+                } else {
+                    Toast.makeText(rootView.getContext(), "Please provide a name and type and try again", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+        return dialog;    }
 
     public static void save(String name, String type, Context context) {
-
-
         FileOutputStream outputStream;
         File directory = context.getFilesDir();
         File profile = new File(directory, "profile");

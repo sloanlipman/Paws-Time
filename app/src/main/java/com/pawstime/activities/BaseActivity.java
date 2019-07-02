@@ -9,14 +9,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.EditText;
 
 import com.pawstime.Pet;
 import com.pawstime.R;
 import com.pawstime.dialogs.AddPet;
 import com.pawstime.dialogs.SelectPet;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.util.ArrayList;
 
 
 public abstract class BaseActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -43,9 +46,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getContentViewId());
-        navView = findViewById(R.id.nav_view);
+        navView = findViewById(R.id.bottomNav);
         navView.setOnNavigationItemSelectedListener(this);
-
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getToolbarTitle());
         setSupportActionBar(toolbar);
@@ -92,6 +94,31 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             selectPet.setCancelable(false);
         }
         selectPet.show(getSupportFragmentManager(), "selectPet");
+    }
+
+    public static ArrayList<String> getPetsList(Context context) {
+        FileReader fr;
+        BufferedReader reader;
+        String stream;
+        ArrayList<String> petList = new ArrayList<>();
+        File directory = context.getFilesDir();
+        File profile = new File(directory, "profile");
+
+        try {
+            fr = new FileReader(profile);
+            reader = new BufferedReader(fr);
+            while((stream = reader.readLine()) != null) {
+                String[] pets = stream.split(",");
+                for (String pet: pets) {
+                    System.out.println(pet);
+                    petList.add(pet);
+                }
+            }
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return petList;
     }
 
     public static String loadPetFile(Context context) {
