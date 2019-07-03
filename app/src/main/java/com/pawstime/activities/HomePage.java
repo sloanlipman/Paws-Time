@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 
 
 import com.pawstime.Pet;
-import com.pawstime.PetCardView;
+import com.pawstime.PetCard;
 import com.pawstime.R;
 import com.pawstime.dialogs.AddPet;
 import com.pawstime.dialogs.SelectPet;
@@ -31,8 +31,12 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
     }
 
     @Override
-    public void onSelectPetDialogPositiveClick(DialogFragment dialog) {}
+    public void onAddPetDialogNegativeClick(DialogFragment dialog) {}
 
+    @Override
+    public void onSelectPetDialogPositiveClick(DialogFragment dialog) {}
+    @Override
+    public void onSelectPetDialogNegativeClick(DialogFragment dialog) {}
     @Override
     public void onSelectPetDialogNeutralClick(DialogFragment dialog) {
         openAddPetDialog();
@@ -91,7 +95,7 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
         ArrayList<String> listOfPets = getPetsList(this);
 
         for (int i = 0; i < listOfPets.size(); i++) {
-            PetCardView cardView = new PetCardView(this);
+            PetCard cardView = new PetCard(this);
             cardView.setName(listOfPets.get(i));
 //            cardView.setPicture();
             petList.addView(cardView);

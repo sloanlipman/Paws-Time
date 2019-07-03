@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pawstime.ImageSaver;
 import com.pawstime.R;
 import com.pawstime.dialogs.AddPet;
 import com.pawstime.dialogs.SelectPet;
@@ -44,9 +45,9 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     Button changePicture;
     EditText description, careInstructions, medicalInfo, preferredVet, emergencyContact;
     TextView petNameAndType;
-    private static final int CAMERA_PIC_REQUEST = 1337; //Request Code for returning picture from camera
-    private static final int GALLERY_PIC_REQUEST = 7331; //Request Code for returning picture from gallery
-    private static final int CAMERA_PERMISSION_REQUEST = 1234;//Request Code for camera permission
+    private static final int CAMERA_PIC_REQUEST = 1337; // Request Code for returning picture from camera
+    private static final int GALLERY_PIC_REQUEST = 7331; // Request Code for returning picture from gallery
+    private static final int CAMERA_PERMISSION_REQUEST = 1234; // Request Code for camera permission
 
     @Override
     public int getContentViewId() {
@@ -71,6 +72,11 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         finish();
     }
 
+    @Override
+    public void onAddPetDialogNegativeClick(DialogFragment dialog) {
+        fabMenu.close(true);
+    }
+
 // Selecting pet listeners
     @Override
     public void onSelectPetDialogPositiveClick(DialogFragment dialog) {
@@ -78,6 +84,12 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         startActivity(getIntent());
         finish();
     }
+
+    @Override
+    public void onSelectPetDialogNegativeClick(DialogFragment dialog) {
+        fabMenu.close(true);
+    }
+
 
     @Override
     public void onSelectPetDialogNeutralClick(DialogFragment dialog) {
@@ -89,8 +101,10 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeUI();
+        initializeFabMenu();
+        initializePictureButton();
         loadPet();
-        selectPicture();
+
     }
 
     public void loadPet() {
@@ -99,19 +113,6 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     }
 
     void initializeUI() {
-        initializeFabMenu();
-        selectPet = findViewById(R.id.selectPet);
-        selectPet.setOnClickListener(v -> openSelectPetDialog());
-
-        save = findViewById(R.id.save);
-        save.setOnClickListener(v -> savePetToFile());
-
-        addPet = findViewById(R.id.addPet);
-        addPet.setOnClickListener(v -> openAddPetDialog());
-
-        export = findViewById(R.id.export);
-        export.setOnClickListener(v -> exportPet());
-
         picture = findViewById(R.id.petPicture);
         changePicture = findViewById(R.id.changePicture);
         description = findViewById(R.id.petDesc);
@@ -125,6 +126,17 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     }
 
     public void initializeFabMenu() {
+        selectPet = findViewById(R.id.selectPet);
+        selectPet.setOnClickListener(v -> openSelectPetDialog());
+
+        save = findViewById(R.id.save);
+        save.setOnClickListener(v -> savePetToFile());
+
+        addPet = findViewById(R.id.addPet);
+        addPet.setOnClickListener(v -> openAddPetDialog());
+
+        export = findViewById(R.id.export);
+        export.setOnClickListener(v -> exportPet());
         fabMenu = findViewById(R.id.fabMenu);
         fabMenu.setClosedOnTouchOutside(true); // Dismiss by tapping anywhere
 
@@ -172,6 +184,36 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                     Log.e("FAB Menu", "The EditText you're looking for isn't specified in this code block"); // Again, we're missing a case if we see this
                 }
             }
+        });
+    }
+
+    // Button click opens AlertDialog to prompt user to select a pet profile picture
+    public void initializePictureButton(){
+        changePicture.setOnClickListener(v -> {
+            AlertDialog.Builder picBuilder = new AlertDialog.Builder(PetProfile.this);
+            //Send user to gallery to select pet profile picture
+            //If user permits use of camera, send user to camera to make pet profile picture
+            picBuilder.setMessage("Would you like to take a new picture or select one from the gallery?")
+                    .setCancelable(true)
+                    .setPositiveButton("Gallery", (dialog, which) -> {
+                        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        galleryIntent.setType("image/*");
+                        startActivityForResult(galleryIntent,GALLERY_PIC_REQUEST);
+                    })
+                    .setNegativeButton("Camera", (dialog, which) -> {
+                        if(ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                            //permission is not granted
+                            ActivityCompat.requestPermissions(PetProfile.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+                        }
+                        else{
+                            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+                            //Picture import gets handled by onActivityResult method
+                        }
+                    });
+            AlertDialog pictureAlert = picBuilder.create();
+            pictureAlert.setTitle("Select A Picture");
+            pictureAlert.show();
         });
     }
 
@@ -235,8 +277,6 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         }
     }
 
-
-
     private void exportPet() {
         savePetToFile(); // Save the pet first
 
@@ -250,7 +290,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         if (petNameAndType.length() > 0) {
             nameAndType = petNameAndType.getText().toString(); // Make sure there is a name and description
 
-            // Parse the UI fields
+        // Parse the UI fields
             if (description.getText().length() > 0) {
                 desc = description.getText().toString() + "\n\n";
             }
@@ -290,55 +330,17 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         }
     }
 
-    //Button click opens AlertDialog to prompt user to select a pet profile picture
-    public void selectPicture(){
-        changePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder picBuilder = new AlertDialog.Builder(PetProfile.this);
-                picBuilder.setMessage("Would you like to take a new picture or select one from the gallery?")
-                    .setCancelable(true)
-                    .setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
-                        @Override
-                        //Send user to gallery to select pet profile picture
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                            galleryIntent.setType("image/*");
-                            startActivityForResult(galleryIntent,GALLERY_PIC_REQUEST);
-                        }
-                    })
-                    .setNegativeButton("Camera", new DialogInterface.OnClickListener() {
-                        @Override
-                        //If user permits use of camera, send user to camera to make pet profile picture
-                        public void onClick(DialogInterface dialog, int which) {
-                            if(ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                                //permission is not granted
-                                ActivityCompat.requestPermissions(PetProfile.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
-                            }
-                            else{
-                                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
-                                //Picture import gets handled by onActivityResult method
-                            }
-                        }
-                    });
-                AlertDialog pictureAlert = picBuilder.create();
-                pictureAlert.setTitle("Select A Picture");
-                pictureAlert.show();
-            }
-        });
-    }
-
     @Override
-    //Pull selected image into app and set pet profile picture
+    // Pull selected image into app and set pet profile picture
     protected void onActivityResult (int requestCode, int resultCode, Intent data){
-        picture = (ImageView) findViewById(R.id.petPicture);
+        picture = findViewById(R.id.petPicture);
         final String path = "/Paws_Time/img" + Pet.getCurrentPetName() + ".png";
         if ((resultCode == Activity.RESULT_OK) && (data != null)){
-            if (requestCode == CAMERA_PIC_REQUEST){//Request code 1337
+            if (requestCode == CAMERA_PIC_REQUEST){ //Request code 1337
                 Bitmap petCameraBitPic = (Bitmap) data.getExtras().get("data");
                 Bitmap petCameraBitPicResize = ImageSaver.resizeBitmap(petCameraBitPic, ImageSaver.PROFILE_SIZE);
                 picture.setImageBitmap(petCameraBitPicResize);
+                // https://stackoverflow.com/questions/21388586/get-uri-from-camera-intent-in-android
             }
             if ((requestCode == GALLERY_PIC_REQUEST) && (data.getData() != null)){//Request code 7331
                 Uri selectedPictureURI = data.getData();
@@ -362,17 +364,16 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     }
 
     @Override
-    //Process permission requests
+    // Process permission requests
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-        switch (requestCode){ //Switch used in case more permission requests need to be processed in the future
-            case CAMERA_PERMISSION_REQUEST: { //Request code 1234
-                //If user gives permission, open camera and request a picture
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
-                    //Picture import gets handled by onActivityResult method
-                }
-                return;
+        // Switch used in case more permission requests need to be processed in the future
+        // Request code 1234
+        // If user gives permission, open camera and request a picture
+        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+                // Picture import gets handled by onActivityResult method
             }
         }
     }

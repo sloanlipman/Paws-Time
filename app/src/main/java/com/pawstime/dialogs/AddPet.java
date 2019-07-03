@@ -33,6 +33,8 @@ public class AddPet extends DialogFragment{
 
     public interface AddPetDialogListener {
         void onAddPetDialogPositiveClick(DialogFragment dialog);
+        void onAddPetDialogNegativeClick(DialogFragment dialog);
+
     }
 
     // Use this instance of the interface to deliver action events
