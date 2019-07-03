@@ -67,6 +67,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     }
 
     @Override
+    public void onBackPressed() {
+        System.out.println("Can't do that, chief");
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_home) {

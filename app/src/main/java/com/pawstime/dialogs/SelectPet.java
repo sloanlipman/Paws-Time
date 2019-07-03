@@ -26,6 +26,7 @@ public class SelectPet extends DialogFragment {
 
     public interface SelectPetDialogListener {
         void onSelectPetDialogPositiveClick(DialogFragment dialog);
+        void onSelectPetDialogNegativeClick(DialogFragment dialog);
         void onSelectPetDialogNeutralClick(DialogFragment dialog);
     }
 

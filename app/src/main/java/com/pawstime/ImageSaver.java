@@ -1,12 +1,11 @@
-package com.pawstime.activities;
+package com.pawstime;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -25,7 +24,7 @@ import java.io.InputStream;
  * Created by Ilya Gazman on 3/6/2016.
  https://stackoverflow.com/questions/17674634/saving-and-reading-bitmaps-images-from-internal-memory-in-android
  */
-class ImageSaver {
+public class ImageSaver {
 
     private static final String directoryName = "Paws_Time";
     private String fileName = "image.png";
@@ -35,7 +34,6 @@ class ImageSaver {
     //Constants for image resizing
     public static final int PROFILE_SIZE = 700;
     public static final int ICON_SIZE = 100;
-
 
     ImageSaver() {
     }
@@ -137,7 +135,6 @@ class ImageSaver {
                         degree = 270;
                         break;
                 }
-
             }
         }
         return degree;
@@ -161,7 +158,7 @@ class ImageSaver {
     }
 
 
-    static Bitmap getCorrectlyOrientedImage(Context context, Uri photoUri, String path, String source) throws IOException {
+    public static Bitmap getCorrectlyOrientedImage(Context context, Uri photoUri, String path, String source) throws IOException {
         InputStream is = context.getContentResolver().openInputStream(photoUri);
         BitmapFactory.Options dbo = new BitmapFactory.Options();
         dbo.inJustDecodeBounds = true;
@@ -224,12 +221,9 @@ class ImageSaver {
     }
 
     //adapted from https://developer.android.com/reference/android/graphics/Bitmap.html
-    static Bitmap resizeBitmap (Bitmap src, int imageSize){
-        int newHeight = imageSize;
-        int newWidth = imageSize;
+    public static Bitmap resizeBitmap(Bitmap src, int imageSize){
 
         //Resize Image
-        Bitmap newImage = src.createScaledBitmap(src,newWidth, newHeight,true);
-        return newImage;
+        return Bitmap.createScaledBitmap(src, imageSize, imageSize,true);
     }
 }
