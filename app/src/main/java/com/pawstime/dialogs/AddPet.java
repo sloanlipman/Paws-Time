@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.pawstime.Pet;
 import com.pawstime.R;
+import com.pawstime.activities.BaseActivity;
 
 import org.json.JSONObject;
 
@@ -94,7 +95,7 @@ public class AddPet extends DialogFragment{
         FileOutputStream outputStream;
         File directory = context.getFilesDir();
         File profile = new File(directory, "profile");
-        ArrayList<String> petList = getPetList(profile);
+        ArrayList<String> petList = BaseActivity.getPetsList(context);
 
         if (!profile.exists()) {
             try {
@@ -148,28 +149,5 @@ public class AddPet extends DialogFragment{
             Toast.makeText(context, "A pet with this name already exists! Please enter a unique name", Toast.LENGTH_SHORT).show();
         }
         return false;
-    }
-
-    public static ArrayList<String> getPetList(File file) {
-        FileReader fr;
-        BufferedReader reader;
-        String stream;
-        ArrayList<String> petList = new ArrayList<>();
-
-        try {
-            fr = new FileReader(file);
-            reader = new BufferedReader(fr);
-            while ((stream = reader.readLine()) != null) {
-                String[] pets = stream.split(",");
-                for (String pet : pets) {
-                    petList.add(pet);
-                }
-            }
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return petList;
     }
 }

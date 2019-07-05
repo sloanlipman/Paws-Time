@@ -279,7 +279,6 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
 
     private void exportPet() {
         savePetToFile(); // Save the pet first
-
         String nameAndType;
         String desc = "";
         String care = "";
@@ -289,12 +288,10 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
 
         if (petNameAndType.length() > 0) {
             nameAndType = petNameAndType.getText().toString(); // Make sure there is a name and description
-
         // Parse the UI fields
             if (description.getText().length() > 0) {
                 desc = description.getText().toString() + "\n\n";
             }
-
             if (careInstructions.getText().length() > 0) {
                 care = "Special care instructions:\n" + careInstructions.getText().toString() + "\n\n";
             }
@@ -319,14 +316,6 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             startActivity(Intent.createChooser(intent, getResources().getText(R.string.export_pet_details)));
         } else {
             Toast.makeText(this, "Something went wrong. Please save your changes and then try again", Toast.LENGTH_SHORT).show(); // For whatever reason if there's no pet name and type, show an error
-        }
-    }
-
-    void getJson(JSONObject json, String string, EditText editText) {
-        try {
-            editText.setText(json.getString(string));
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 
