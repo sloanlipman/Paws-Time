@@ -6,92 +6,109 @@
     android:layout_height="match_parent"
     tools:context=".activities.HomePage">
 
-    <TextView
-        android:id="@+id/yourPet"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/your_pets"
-        android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@+id/homeLogo" />
-
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        android:layout_width="374dp"
-        android:layout_height="278dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/yourPet"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="40dp">
 
-        <android.support.v4.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="50dp"
-            android:background="@android:color/transparent"
-            android:fillViewport="true">
+            android:layout_marginTop="60dp"
+            android:orientation="vertical"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:paddingBottom="120dp">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                android:text="@string/welcome_to_pawstime"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/include"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/include"
+                app:layout_constraintVertical_bias="0.12" />
 
-                <LinearLayout
-                    android:id="@+id/petList"
+            <ImageView
+                android:id="@+id/homeLogo"
+                android:layout_width="164dp"
+                android:layout_height="158dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/welcome_to_pawstime"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@tools:sample/avatars"
+                tools:srcCompat="@drawable/ic_paws_time" />
+
+            <TextView
+            android:id="@+id/yourPet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/your_pets"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@+id/homeLogo" />
+
+            <FrameLayout
+                android:id="@+id/frameLayout"
+                android:layout_width="374dp"
+                android:layout_height="278dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/yourPet"
+                app:layout_constraintVertical_bias="0.0">
+
+                <android.support.v4.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="50dp"
                     android:background="@android:color/transparent"
-                    android:orientation="vertical">
+                    android:fillViewport="true">
 
-                </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp"
-                    android:background="@android:color/transparent"
-                    android:orientation="vertical" />
+                        <LinearLayout
+                            android:id="@+id/petList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"
+                            android:orientation="vertical" />
 
-            </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
-
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/welcome_to_pawstime"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/include"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/include"
-        app:layout_constraintVertical_bias="0.12" />
-
-    <ImageView
-        android:id="@+id/homeLogo"
-        android:layout_width="164dp"
-        android:layout_height="158dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="144dp"
-        android:contentDescription="@string/welcome_to_pawstime"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.481"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars"
-        tools:srcCompat="@drawable/ic_paws_time" />
-
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="20dp"
+                            android:background="@android:color/transparent"
+                            android:orientation="vertical" />
+                    </LinearLayout>
+                </android.support.v4.widget.NestedScrollView>
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
     <include
         android:id="@+id/include"
         layout="@layout/activity_base"
@@ -99,5 +116,4 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 </android.support.constraint.ConstraintLayout>

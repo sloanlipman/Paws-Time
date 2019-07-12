@@ -1,10 +1,12 @@
 package com.pawstime.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
@@ -31,6 +33,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
     BottomNavigationView navView;
     Toolbar toolbar;
+    static String currentActivity = "Home";
+    static MenuItem requestedMenuItem;
+    boolean areChangesUnsaved = false;
 
     private void updateNavigationBarState() {
         int actionId = this.getNavigationMenuItemId();
@@ -51,7 +56,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getToolbarTitle());
         setSupportActionBar(toolbar);
-
     }
 
     @Override
@@ -67,22 +71,42 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     }
 
     @Override
-    public void onBackPressed() {
-        System.out.println("Can't do that, chief");
-    }
+    public void onBackPressed() {} // Disable hardware back button
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            int itemId = item.getItemId();
-            if (itemId == R.id.navigation_home) {
-                startActivity(new Intent(this, HomePage.class));
-            } else if (itemId == R.id.navigation_reminders) {
-                startActivity(new Intent(this, RemindersList.class));
-            } else if (itemId == R.id.navigation_viewPets) {
-                startActivity(new Intent(this, PetProfile.class));
-            }
-            finish();
+        requestedMenuItem = item;
+        if (currentActivity.equals("Profile") && requestedMenuItem.getItemId() != R.id.navigation_profile && areChangesUnsaved) { // && !someCheckForUnsavedChangesMethod()
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("com.pawstime.open_unsaved_dialog"));
+        } else {
+            performNavigate(requestedMenuItem);
+        }
         return true;
+    }
+
+    public void performNavigate(MenuItem item) {
+        int itemId = item.getItemId();
+
+        switch(itemId) {
+            case R.id.navigation_home: {
+                startActivity(new Intent(this, HomePage.class));
+                currentActivity = "Home";
+                break;
+            }
+
+            case R.id.navigation_reminders: {
+                startActivity(new Intent(this, RemindersList.class));
+                currentActivity = "Reminders";
+                break;
+            }
+
+            case R.id.navigation_profile: {
+                startActivity(new Intent(this, PetProfile.class));
+                currentActivity = "Profile";
+                break;
+            }
+        }
+        finish();
     }
 
     void openAddPetDialog() {
@@ -129,7 +153,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
         // Read the File
         try {
-            input = context.openFileInput(Pet.getCurrentPetName());
+            input = context.openFileInput(Pet.getCurrentPet());
             int i;
             while ((i = input.read()) != -1) {
                 stream.append((char) i); // Append each byte as a character to the StringBuilder
@@ -140,4 +164,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         }
         return new String(stream);
     }
+
+    public static void startProfileActivity(Context context) {
+        Intent i = new Intent(context, PetProfile.class);
+        context.startActivity(i);
+        ((Activity)context).finish();
+    }
+
 }

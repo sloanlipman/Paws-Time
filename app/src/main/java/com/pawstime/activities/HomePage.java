@@ -1,6 +1,6 @@
 package com.pawstime.activities;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
@@ -25,16 +25,16 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
 
     @Override
     public void onAddPetDialogPositiveClick(DialogFragment dialog) {
-            Intent i = new Intent(this, PetProfile.class);
-            startActivity(i);
-            finish();
+        startProfileActivity(this);
     }
 
     @Override
     public void onAddPetDialogNegativeClick(DialogFragment dialog) {}
 
     @Override
-    public void onSelectPetDialogPositiveClick(DialogFragment dialog) {}
+    public void onSelectPetDialogPositiveClick(DialogFragment dialog) {
+        startProfileActivity(this);
+    }
     @Override
     public void onSelectPetDialogNegativeClick(DialogFragment dialog) {}
     @Override
@@ -68,15 +68,14 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
     }
 
     private void checkForPets() {
-        String currentPetName = Pet.getCurrentPetName();
-        String currentPetType = Pet.getCurrentPetType();
+        String currentPet = Pet.getCurrentPet();
 
         // Check if the profile file exists
         File directory = getApplicationContext().getFilesDir();
         File profile = new File(directory, "profile");
-        if (currentPetName == null && currentPetType == null) {
+        if (currentPet == null) {
             if (profile.exists()) {
-                openSelectPetDialog();
+                Pet.setCurrentPet(getPetsList(this).get(0));
             } else {
                 openAddPetDialog();
             }
@@ -93,14 +92,17 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
         LinearLayout petList = findViewById(R.id.petList);
 
         ArrayList<String> listOfPets = getPetsList(this);
-
         for (int i = 0; i < listOfPets.size(); i++) {
             PetCard cardView = new PetCard(this);
             cardView.setName(listOfPets.get(i));
 //            cardView.setPicture();
             petList.addView(cardView);
         }
+    }
 
+    public static void clickPetCard(String name, Context context) {
+        Pet.setCurrentPet(name);
+        startProfileActivity(context);
     }
 }
 

@@ -19,11 +19,9 @@ import com.pawstime.activities.BaseActivity;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 
 import java.io.FileOutputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 
 public class AddPet extends DialogFragment{
@@ -35,7 +33,6 @@ public class AddPet extends DialogFragment{
     public interface AddPetDialogListener {
         void onAddPetDialogPositiveClick(DialogFragment dialog);
         void onAddPetDialogNegativeClick(DialogFragment dialog);
-
     }
 
     // Use this instance of the interface to deliver action events
@@ -80,7 +77,9 @@ public class AddPet extends DialogFragment{
             Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             positive.setOnClickListener(v -> {
                 if (name.getText().toString().length() > 0 && type.getText().toString().length() > 0) {
-                    if (save(name.getText().toString(), type.getText().toString(), rootView.getContext())) {
+                    String newPet = name.getText().toString() + " the " + type.getText().toString();
+
+                    if (save(newPet, rootView.getContext())) {
                         listener.onAddPetDialogPositiveClick(AddPet.this); // Put the listener right where we want the actions to be occurring
                     }
                 } else {
@@ -91,7 +90,7 @@ public class AddPet extends DialogFragment{
         return dialog;
     }
 
-    public boolean save(String name, String type, Context context) {
+    public boolean save(String newPet, Context context) {
         FileOutputStream outputStream;
         File directory = context.getFilesDir();
         File profile = new File(directory, "profile");
@@ -107,14 +106,13 @@ public class AddPet extends DialogFragment{
         }
 
     // If pet is a new pet
-        if (!petList.contains(name)) {
+        if (!petList.contains(newPet)) {
             ArrayMap<String, String> map = new ArrayMap<>();
-            map.put("name", name);
-            map.put("type", type);
+            map.put("nameAndType", newPet);
             JSONObject json = new JSONObject(map);
 
             try {
-                outputStream = context.openFileOutput(name, Context.MODE_PRIVATE);
+                outputStream = context.openFileOutput(newPet, Context.MODE_PRIVATE);
                 outputStream.write(json.toString().getBytes());
                 outputStream.close(); // Don't forget to close the stream!
                 Toast.makeText(context, "Pet successfully added!", Toast.LENGTH_SHORT).show();
@@ -132,10 +130,9 @@ public class AddPet extends DialogFragment{
 
                     outputStream = context.openFileOutput("profile", Context.MODE_PRIVATE);
                     outputStream.write(petsToWrite.getBytes()); // Write previous pets
-                    outputStream.write((name + ",").getBytes()); // Append new pet's name and a separator (comma)
+                    outputStream.write((newPet + ",").getBytes()); // Append new pet's name and a separator (comma)
                     outputStream.close();
-                    Pet.setCurrentPetName(name);
-                    Pet.setCurrentPetType(type);
+                    Pet.setCurrentPet(newPet);
                     return true;
                 } catch (Exception e) {
                     e.printStackTrace();

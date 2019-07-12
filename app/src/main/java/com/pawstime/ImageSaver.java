@@ -49,7 +49,7 @@ public class ImageSaver {
 
     //Create unique image file name
     public ImageSaver setFileName() {
-        this.fileName =  Pet.getCurrentPetName() + ".png";
+        this.fileName =  Pet.getCurrentPet() + ".png";
         return this;
     }
 
