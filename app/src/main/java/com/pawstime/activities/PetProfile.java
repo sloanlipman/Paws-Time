@@ -35,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -48,6 +49,10 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     private static final int CAMERA_PIC_REQUEST = 1337; // Request Code for returning picture from camera
     private static final int GALLERY_PIC_REQUEST = 7331; // Request Code for returning picture from gallery
     private static final int CAMERA_PERMISSION_REQUEST = 1234; // Request Code for camera permission
+    private static final int GAL_STORAGE_PERMISSION_REQUEST = 4321; // Request Code for external storage permission
+    private static final int CAM_STORAGE_PERMISSION_REQUEST = 5432; // Request Code for external storage permission
+    private static String path;
+
 
     @Override
     public int getContentViewId() {
@@ -104,12 +109,27 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         initializeFabMenu();
         initializePictureButton();
         loadPet();
-
+        loadPath();
+        loadPic(ImageSaver.PROFILE_SIZE, picture);
     }
 
     public void loadPet() {
         String jsonString = BaseActivity.loadPetFile(this);
         setPetProfileUI(jsonString);
+    }
+
+    //Loads image path using current pet name
+    public void loadPath(){
+        path = ImageSaver.directoryName + Pet.getCurrentPetName() + ".png";
+    }
+
+    //Loads and resizes existing pet profile picture into ImageView
+    public void loadPic(int picSize, ImageView pic) {
+        if ((path != null) && (ImageSaver.load(path) != null)){
+            Bitmap picResize = ImageSaver.resizeBitmap(ImageSaver.load(path), picSize);
+            pic.setImageBitmap(picResize);
+//            picture.setImageBitmap(ImageSaver.load(path));
+        }
     }
 
     void initializeUI() {
@@ -206,15 +226,20 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                             ActivityCompat.requestPermissions(PetProfile.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
                         }
                         else{
-                            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
-                            //Picture import gets handled by onActivityResult method
+                            takePicture();
                         }
                     });
             AlertDialog pictureAlert = picBuilder.create();
             pictureAlert.setTitle("Select A Picture");
             pictureAlert.show();
         });
+    }
+
+    //Take picture using camera
+    private void takePicture(){
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+        //Picture import gets handled by onActivityResult method
     }
 
     public void savePetToFile() {
@@ -319,26 +344,64 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         }
     }
 
+
+    Bitmap petBitPicResize;
     @Override
     // Pull selected image into app and set pet profile picture
     protected void onActivityResult (int requestCode, int resultCode, Intent data){
-        picture = findViewById(R.id.petPicture);
-        final String path = "/Paws_Time/img" + Pet.getCurrentPetName() + ".png";
         if ((resultCode == Activity.RESULT_OK) && (data != null)){
+            AlertDialog.Builder requestBuilder = new AlertDialog.Builder(PetProfile.this);
             if (requestCode == CAMERA_PIC_REQUEST){ //Request code 1337
-                Bitmap petCameraBitPic = (Bitmap) data.getExtras().get("data");
-                Bitmap petCameraBitPicResize = ImageSaver.resizeBitmap(petCameraBitPic, ImageSaver.PROFILE_SIZE);
-                picture.setImageBitmap(petCameraBitPicResize);
-                // https://stackoverflow.com/questions/21388586/get-uri-from-camera-intent-in-android
+                try{
+                    Bitmap petCameraBitPic = (Bitmap) data.getExtras().get("data");
+                    petBitPicResize = ImageSaver.resizeBitmap(petCameraBitPic, ImageSaver.PROFILE_SIZE);
+                    if(ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        //permission is not granted
+                        requestBuilder.setMessage("Paws Time needs your permission to store the profile picture.")
+                                .setCancelable(true)
+                                .setPositiveButton("Ok", (dialog, which) -> {
+                                    ActivityCompat.requestPermissions(PetProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAM_STORAGE_PERMISSION_REQUEST);
+                                })
+                                .setNegativeButton("Cancel", null);
+                        AlertDialog requestAlert = requestBuilder.create();
+                        requestAlert.setTitle("File Permissions Request");
+                        requestAlert.show();
+                    }
+                    else{
+                        Context inContext = getApplicationContext();
+                        petBitPicResize = ImageSaver.getCorrectlyOrientedImage(getApplicationContext(), ImageSaver.getImageUri(petBitPicResize, inContext), path, "Uploaded");
+                        picture.setImageBitmap(petBitPicResize);
+                        new ImageSaver().setExternal(true).setFileName().save(petBitPicResize);
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             if ((requestCode == GALLERY_PIC_REQUEST) && (data.getData() != null)){//Request code 7331
                 Uri selectedPictureURI = data.getData();
                 if (selectedPictureURI.toString().contains("image")){
                     try{
                         Bitmap petGalleryBitPic = ImageSaver.getCorrectlyOrientedImage(getApplicationContext(), selectedPictureURI, path, "Uploaded");
-                        Bitmap petGalleryBitPicResize = ImageSaver.resizeBitmap(petGalleryBitPic, ImageSaver.PROFILE_SIZE);
-                        Drawable petGalleryPic = new BitmapDrawable(getResources(), petGalleryBitPicResize);
-                        picture.setImageDrawable(petGalleryPic);
+                        petGalleryBitPic = ImageSaver.resizeBitmap(petGalleryBitPic, ImageSaver.PROFILE_SIZE);
+                        petBitPicResize = petGalleryBitPic;
+                        if(ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                            //permission is not granted
+                            requestBuilder.setMessage("Paws Time needs your permission to store the profile picture.")
+                                    .setCancelable(true)
+                                    .setPositiveButton("Ok", (dialog, which) -> {
+                                        ActivityCompat.requestPermissions(PetProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, GAL_STORAGE_PERMISSION_REQUEST);
+                                    })
+                                    .setNegativeButton("Cancel", null);
+                            AlertDialog requestAlert = requestBuilder.create();
+                            requestAlert.setTitle("File Permissions Request");
+                            requestAlert.show();
+                        }
+                        else{
+                            picture.setImageBitmap(petBitPicResize);
+                            new ImageSaver().setExternal(true).setFileName().save(petBitPicResize);
+                        }
+
                     }
                     catch (IOException e){
                         e.printStackTrace();
@@ -355,14 +418,29 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     @Override
     // Process permission requests
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-        // Switch used in case more permission requests need to be processed in the future
-        // Request code 1234
         // If user gives permission, open camera and request a picture
-        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+        if (requestCode == CAMERA_PERMISSION_REQUEST) { // Request code 1234
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
-                // Picture import gets handled by onActivityResult method
+                takePicture();
+            }
+        }
+        if (requestCode == GAL_STORAGE_PERMISSION_REQUEST) { // Request code 4321
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                picture.setImageBitmap(petBitPicResize);
+                new ImageSaver().setExternal(true).setFileName().save(petBitPicResize);
+            }
+        }
+        if (requestCode == CAM_STORAGE_PERMISSION_REQUEST) { // Request code 5432
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                try{
+                    Context inContext = getApplicationContext();
+                    petBitPicResize = ImageSaver.getCorrectlyOrientedImage(getApplicationContext(), ImageSaver.getImageUri(petBitPicResize, inContext), path, "Uploaded");
+                    picture.setImageBitmap(petBitPicResize);
+                    new ImageSaver().setExternal(true).setFileName().save(petBitPicResize);
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

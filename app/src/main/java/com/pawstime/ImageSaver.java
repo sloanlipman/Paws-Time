@@ -1,5 +1,6 @@
 package com.pawstime;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,12 +13,16 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.pawstime.activities.PetProfile;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  Adapted from:
@@ -26,7 +31,7 @@ import java.io.InputStream;
  */
 public class ImageSaver {
 
-    private static final String directoryName = "Paws_Time";
+    public static final String directoryName = "Paws_Time/";
     private String fileName = "image.png";
     private Context context;
     private boolean external;
@@ -35,24 +40,25 @@ public class ImageSaver {
     public static final int PROFILE_SIZE = 700;
     public static final int ICON_SIZE = 100;
 
-    ImageSaver() {
+    public ImageSaver() {
     }
 
     ImageSaver(Context context) {
         this.context = context;
     }
 
-    ImageSaver setFileName(String fileName) {
-        this.fileName = fileName;
+    //Create unique image file name
+    public ImageSaver setFileName() {
+        this.fileName =  Pet.getCurrentPetName() + ".png";
         return this;
     }
 
-    ImageSaver setExternal(boolean external) {
-        this.external = external;
+    public ImageSaver setExternal(boolean isExternal) {
+        this.external = isExternal;
         return this;
     }
 
-    void save(Bitmap bitmapImage) {
+    public void save(Bitmap bitmapImage) {
         FileOutputStream fileOutputStream = null;
         try {
             fileOutputStream = new FileOutputStream(createFile());
@@ -73,7 +79,7 @@ public class ImageSaver {
 
     //Creates Paws_Time directory on your phone
     @NonNull
-    private File createFile() {
+    public File createFile() {
         File directory;
         if (external) {
             directory = new File(Environment.getExternalStorageDirectory(), directoryName);
@@ -92,7 +98,7 @@ public class ImageSaver {
         return new File(directory, fileName);
     }
 
-    Bitmap load(String path) {
+    public static Bitmap load(String path) {
         FileInputStream inputStream = null;
         try {
             File f = new File(Environment.getExternalStorageDirectory(), path);
@@ -213,17 +219,39 @@ public class ImageSaver {
     }
 
     // adapted from https://colinyeoh.wordpress.com/2012/05/18/android-getting-image-uri-from-bitmap/
-    static Uri getImageUri(Bitmap inImage, String userid) {
+    public static Uri getImageUri(Bitmap inImage, Context inContext) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        File image = new File(Environment.getExternalStorageDirectory(), directoryName + "/img" + userid + ".png");
-        return Uri.fromFile(image);
+        inImage.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     //adapted from https://developer.android.com/reference/android/graphics/Bitmap.html
     public static Bitmap resizeBitmap(Bitmap src, int imageSize){
+        //Get original image dimensions
+        int height = src.getHeight();
+        int width = src.getWidth();
+
+        int newHeight;
+        int newWidth;
+
+        //Adjust dimensions to maintain aspect ratio
+        if (width > height) {
+            newWidth = imageSize;
+            newHeight = (imageSize * height) / width;
+        }
+        else if (height > width){
+            newHeight = imageSize;
+            newWidth = (imageSize * width) / height;
+        }
+        else {
+            newHeight = imageSize;
+            newWidth = imageSize;
+        }
 
         //Resize Image
-        return Bitmap.createScaledBitmap(src, imageSize, imageSize,true);
+        return Bitmap.createScaledBitmap(src, newWidth, newHeight,true);
     }
+
+
 }
