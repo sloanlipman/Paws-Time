@@ -2,33 +2,39 @@ package com.pawstime.activities;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.ArrayMap;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pawstime.ImageSaver;
 import com.pawstime.R;
 import com.pawstime.dialogs.AddPet;
+import com.pawstime.dialogs.DeleteProfile;
 import com.pawstime.dialogs.SelectPet;
 import com.pawstime.Pet;
 import com.pawstime.dialogs.UnsavedChangesDialog;
@@ -37,37 +43,34 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListener, SelectPet.SelectPetDialogListener, UnsavedChangesDialog.UnsavedChangesDialogListener {
-    com.github.clans.fab.FloatingActionButton addPet, selectPet, export, save;
+public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListener, SelectPet.SelectPetDialogListener,
+        UnsavedChangesDialog.UnsavedChangesDialogListener, DeleteProfile.DeleteProfileDialogListener {
+
+    com.github.clans.fab.FloatingActionButton addPet, selectPet, export, save, delete;
     com.github.clans.fab.FloatingActionMenu fabMenu;
-    ImageView picture;
+    de.hdodenhof.circleimageview.CircleImageView picture;
     Button changePicture;
     EditText description, careInstructions, medicalInfo, preferredVet, emergencyContact;
     TextView petNameAndType;
+    ConstraintLayout profileLayout;
+    ProgressBar progressBar;
 
     private static final int CAMERA_PIC_REQUEST = 1337; // Request Code for returning picture from camera
     private static final int GALLERY_PIC_REQUEST = 7331; // Request Code for returning picture from gallery
     private static final int CAMERA_PERMISSION_REQUEST = 1234; // Request Code for camera permission
     private static final int GAL_STORAGE_PERMISSION_REQUEST = 4321; // Request Code for external storage permission
     private static final int CAM_STORAGE_PERMISSION_REQUEST = 5432; // Request Code for external storage permission
-    private static String path;
+    File tempFile;
+    String currentPhotoPath;
     Bitmap petBitPicResize;
 
-    
-    LocalBroadcastManager lbm;
     boolean openSelectPetAfterUnsavedDialog = false;
     boolean openAddPetAfterUnsavedDialog = false;
-
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i("Pet", "Received");
-            openUnsavedDialog();
-        }
-    };
 
     @Override
     public int getContentViewId() {
@@ -87,7 +90,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
 // Add pet listeners
     @Override
     public void onAddPetDialogPositiveClick(DialogFragment dialog) {
-       fabMenu.close(true);
+        fabMenu.close(true);
         startActivity(getIntent());
         finish();
     }
@@ -145,20 +148,13 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         selectBottomNavigationBarItem(R.id.navigation_profile);
     }
 
-   @Override
-   public void onStart() {
-       super.onStart();
-       // Register the receiver to the activity using a LocalBroadcastManager
-       IntentFilter intentFilter = new IntentFilter("com.pawstime.open_unsaved_dialog");
-       lbm =  LocalBroadcastManager.getInstance(getApplicationContext());
-       LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter);
-   }
-
-   @Override
-   public void onPause() {
-       super.onPause();
-       LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-   }
+    public void onDeleteProfileDialogPositiveClick(DialogFragment dialog) {
+        fabMenu.close(true);
+        deleteProfile();
+    }
+    public void onDeleteProfileDialogNegativeClick(DialogFragment dialog) {
+        fabMenu.close(true);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -168,26 +164,12 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         initializePictureButton();
         loadPet();
         loadPath();
-        loadPic(ImageSaver.PROFILE_SIZE, picture);
+        loadPic(ImageSaver.PROFILE_SIZE, picture, path);
     }
 
     public void loadPet() {
-        String jsonString = BaseActivity.loadPetFile(this);
+        String jsonString = loadPetFile(this);
         setPetProfileUI(jsonString);
-    }
-
-    //Loads image path using current pet name
-    public void loadPath(){
-        path = ImageSaver.directoryName + Pet.getCurrentPet() + ".png";
-    }
-
-    //Loads and resizes existing pet profile picture into ImageView
-    public void loadPic(int picSize, ImageView pic) {
-        if ((path != null) && (ImageSaver.load(path) != null)){
-            Bitmap picResize = ImageSaver.resizeBitmap(ImageSaver.load(path), picSize);
-            pic.setImageBitmap(picResize);
-//            picture.setImageBitmap(ImageSaver.load(path));
-        }
     }
 
     void initializeUI() {
@@ -202,6 +184,9 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         petNameAndType.setText(Pet.getCurrentPet());
         EditText[] editTexts = {description, careInstructions, medicalInfo, preferredVet, emergencyContact};
         setAddTextChangedListener(editTexts);
+
+        progressBar = findViewById(R.id.indeterminateBar);
+        profileLayout = findViewById(R.id.profileLayout);
     }
 
     public void setAddTextChangedListener(EditText[] editTexts) {
@@ -212,7 +197,6 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     currentText = s.toString();
                     areChangesUnsaved = false;
-                    System.out.println("Before Text changed " + s.toString());
                 }
 
                 @Override
@@ -220,11 +204,12 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                     if (!currentText.equals(s.toString())) {
                         areChangesUnsaved = true;
                     }
-                    System.out.println("On Text changed " + s.toString());
                 }
-
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (!currentText.equals(s.toString())) {
+                        areChangesUnsaved = true;
+                    }
                 }
             });
         }
@@ -260,6 +245,13 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
 
         export = findViewById(R.id.export);
         export.setOnClickListener(v -> exportPet());
+
+        delete = findViewById(R.id.delete);
+        delete.setOnClickListener(v -> {
+            DialogFragment deleteProfileDialog = new DeleteProfile();
+            deleteProfileDialog.show(getSupportFragmentManager(), "deleteProfile");
+        });
+
         fabMenu = findViewById(R.id.fabMenu);
         fabMenu.setClosedOnTouchOutside(true); // Dismiss by tapping anywhere
 
@@ -319,8 +311,8 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             picBuilder.setMessage("Would you like to take a new picture or select one from the gallery?")
                     .setCancelable(true)
                     .setPositiveButton("Gallery", (dialog, which) -> {
-                        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        galleryIntent.setType("image/*");
+                        Intent galleryIntent = new Intent(Intent.ACTION_PICK);
+                        galleryIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                         startActivityForResult(galleryIntent,GALLERY_PIC_REQUEST);
                     })
                     .setNegativeButton("Camera", (dialog, which) -> {
@@ -337,16 +329,36 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             pictureAlert.show();
         });
     }
+    private void createImageFile() {
+        // Create an image file name
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        tempFile = new File(storageDir + "/temp.png");
 
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = tempFile.getAbsolutePath();
+    }
     //Take picture using camera
     private void takePicture(){
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
-        //Picture import gets handled by onActivityResult method
-    }
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+
+            createImageFile();
+            // Continue only if the File was successfully created
+            if (tempFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.pawstime.fileprovider",
+                        tempFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_PIC_REQUEST);
+            }
+        }
+}
 
     public void savePetToFile() {
     // Read values from the UI
+
         ArrayMap<String, String> map = new ArrayMap<>();
         map.put("nameAndType", Pet.getCurrentPet());
         map.put("description", description.getText().toString());
@@ -372,6 +384,15 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             e.printStackTrace();
             Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
         }
+        Bitmap petBit = ((BitmapDrawable)picture.getDrawable()).getBitmap();
+
+        new ImageSaver().setExternal(true).setFileName().save(petBit);
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        tempFile = new File(storageDir + "/temp.png");
+        if (tempFile.exists()) {
+            tempFile.delete();
+        }
+
     }
 
     public void setPetProfileUI(String jsonString) {
@@ -434,121 +455,177 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                 contact = "In case of emergency, please contact:\n" + emergencyContact.getText().toString();
             }
 
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
+
             String message = "I'm using PawsTime to help keep track of my pets! Here is some information about " + nameAndType + "!\n\n" + desc + care + medical + vet + contact;
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_SUBJECT, "Check out my pet!");
             intent.putExtra(Intent.EXTRA_TEXT, message);
-            intent.setType("text/plain");
+            intent.setType("image/gif");
+            File directory = new File(Environment.getExternalStorageDirectory(), ImageSaver.directoryName);
+            File picture = new File(directory, Pet.getCurrentPet() + ".png");
+            if (picture.exists()) {
+                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(picture));
+            }
+
             startActivity(Intent.createChooser(intent, getResources().getText(R.string.export_pet_details)));
         } else {
             Toast.makeText(this, "Something went wrong. Please save your changes and then try again", Toast.LENGTH_SHORT).show(); // For whatever reason if there's no pet name and type, show an error
         }
     }
 
-    void openUnsavedDialog() {
-        DialogFragment unsavedChangesDialog = new UnsavedChangesDialog();
-        unsavedChangesDialog.show(getSupportFragmentManager(), "unsavedChangesDialog");
+    private void deleteProfile() {
+        FileOutputStream outputStream;
+        File dir = getFilesDir();
+
+    // Delete the pet's profile file
+        File petInformation = new File(dir, Pet.getCurrentPet());
+        petInformation.delete();
+
+    // Delete the picture
+        File currentPetPicture = new File(Environment.getExternalStorageDirectory(), path);
+        currentPetPicture.delete();
+
+    // Rewrite the output String
+        ArrayList<String> currentListOfPets = getPetsList(this);
+        currentListOfPets.remove(Pet.getCurrentPet()); // Remove pet
+        try {
+
+            StringBuilder pets = new StringBuilder();
+            for (String pet: currentListOfPets) {
+                    pets.append(pet);
+                    pets.append(",");
+            }
+
+            outputStream = openFileOutput("profile", Context.MODE_PRIVATE);
+            outputStream.write(new String(pets).getBytes()); // Write previous pets
+            outputStream.close();
+
+            if (currentListOfPets.size() != 0) {
+                Pet.setCurrentPet(currentListOfPets.get(0)); // Set the first pet as the current pet
+            } else {
+                File profile = new File(dir, "profile");
+                profile.delete(); // Delete the entire profile file so we can start from scratch
+                Pet.setCurrentPet(null); // Set null so the home page will prompt to add a new one
+            }
+
+            Intent intent = new Intent(this, HomePage.class);
+            startActivity(intent);
+            finish();
+            Toast.makeText(this, "Profile deleted. Navigating home.", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     // Pull selected image into app and set pet profile picture
     protected void onActivityResult (int requestCode, int resultCode, Intent data){
         picture = findViewById(R.id.petPicture);
-        final String path = "/Paws_Time/img" + Pet.getCurrentPet() + ".png";
+        progressBar.setVisibility(View.VISIBLE);
+        profileLayout.setAlpha(0.5f);
         if ((resultCode == Activity.RESULT_OK) && (data != null)){
-            AlertDialog.Builder requestBuilder = new AlertDialog.Builder(PetProfile.this);
-            if (requestCode == CAMERA_PIC_REQUEST){ //Request code 1337
-                try{
-                    Bitmap petCameraBitPic = (Bitmap) data.getExtras().get("data");
-                    petBitPicResize = ImageSaver.resizeBitmap(petCameraBitPic, ImageSaver.PROFILE_SIZE);
-                    if(ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                        //permission is not granted
-                        requestBuilder.setMessage("Paws Time needs your permission to store the profile picture.")
-                                .setCancelable(true)
-                                .setPositiveButton("Ok", (dialog, which) -> {
-                                    ActivityCompat.requestPermissions(PetProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAM_STORAGE_PERMISSION_REQUEST);
-                                })
-                                .setNegativeButton("Cancel", null);
-                        AlertDialog requestAlert = requestBuilder.create();
-                        requestAlert.setTitle("File Permissions Request");
-                        requestAlert.show();
-                    }
-                    else{
-                        Context inContext = getApplicationContext();
-                        petBitPicResize = ImageSaver.getCorrectlyOrientedImage(getApplicationContext(), ImageSaver.getImageUri(petBitPicResize, inContext), path, "Uploaded");
-                        picture.setImageBitmap(petBitPicResize);
-                        new ImageSaver().setExternal(true).setFileName().save(petBitPicResize);
-                    }
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
+            if (requestCode == CAMERA_PIC_REQUEST) { //Request code 1337
+                if (ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    showFilePermissionsRequest(CAM_STORAGE_PERMISSION_REQUEST).show(); // Request permissions if not yet granted
+                } else{
+                    setCameraBitmap();
                 }
             }
             if ((requestCode == GALLERY_PIC_REQUEST) && (data.getData() != null)){//Request code 7331
                 Uri selectedPictureURI = data.getData();
                 if (selectedPictureURI.toString().contains("image")){
                     try{
-                        Bitmap petGalleryBitPic = ImageSaver.getCorrectlyOrientedImage(getApplicationContext(), selectedPictureURI, path, "Uploaded");
+                        Bitmap petGalleryBitPic = ImageSaver.getCorrectlyOrientedImage(getApplicationContext(), selectedPictureURI);
                         petGalleryBitPic = ImageSaver.resizeBitmap(petGalleryBitPic, ImageSaver.PROFILE_SIZE);
                         petBitPicResize = petGalleryBitPic;
-                        if(ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                            //permission is not granted
-                            requestBuilder.setMessage("Paws Time needs your permission to store the profile picture.")
-                                    .setCancelable(true)
-                                    .setPositiveButton("Ok", (dialog, which) -> {
-                                        ActivityCompat.requestPermissions(PetProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, GAL_STORAGE_PERMISSION_REQUEST);
-                                    })
-                                    .setNegativeButton("Cancel", null);
-                            AlertDialog requestAlert = requestBuilder.create();
-                            requestAlert.setTitle("File Permissions Request");
-                            requestAlert.show();
-                        }
-                        else{
+                        if (ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                            showFilePermissionsRequest(GAL_STORAGE_PERMISSION_REQUEST).show(); // Request permissions if not yet granted
+                        } else{
                             picture.setImageBitmap(petBitPicResize);
-                            new ImageSaver().setExternal(true).setFileName().save(petBitPicResize);
+                            areChangesUnsaved = true;
+                            progressBar.setVisibility(View.GONE);
+                            profileLayout.setAlpha(1);
                         }
-
-                    }
-                    catch (IOException e){
+                    } catch (IOException e){
                         e.printStackTrace();
                     }
                 }
             }
-        }
-        else if(resultCode == Activity.RESULT_CANCELED){
+        } else if(resultCode == Activity.RESULT_CANCELED){
             Toast.makeText(this, "Pet Profile Picture Selection Canceled", Toast.LENGTH_LONG).show();
+            progressBar.setVisibility(View.GONE);
+            profileLayout.setAlpha(1);
         }
+
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private AlertDialog showFilePermissionsRequest(int requestCode) {
+        AlertDialog.Builder requestBuilder = new AlertDialog.Builder(PetProfile.this);
+        requestBuilder.setMessage("Paws Time needs your permission to store the profile picture.")
+                .setCancelable(true)
+                .setPositiveButton("Ok", (dialog, which) -> {
+                    progressBar.setVisibility(View.VISIBLE);
+                    profileLayout.setAlpha(0.5f);
+                    ActivityCompat.requestPermissions(PetProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    progressBar.setVisibility(View.GONE);
+                    profileLayout.setAlpha(1);
+                });
+        AlertDialog requestAlert = requestBuilder.create();
+        requestAlert.setOnCancelListener(dialog -> {
+            progressBar.setVisibility(View.GONE);
+            profileLayout.setAlpha(1);
+        });
+        requestAlert.setTitle("File Permissions Request");
+        return requestAlert;
+    }
+
+    private void setCameraBitmap() {
+        Bitmap cameraBit = BitmapFactory.decodeFile(currentPhotoPath, null);
+        Context inContext = getApplicationContext();
+        try {
+            petBitPicResize = ImageSaver.getCorrectlyOrientedImage(getApplicationContext(), ImageSaver.getImageUri(cameraBit, inContext));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        picture.setImageBitmap(petBitPicResize);
+        areChangesUnsaved = true;
+        progressBar.setVisibility(View.GONE);
+        profileLayout.setAlpha(1);
     }
 
     @Override
     // Process permission requests
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // If user gives permission, open camera and request a picture
-        if (requestCode == CAMERA_PERMISSION_REQUEST) { // Request code 1234
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                takePicture();
-            }
-        }
-        if (requestCode == GAL_STORAGE_PERMISSION_REQUEST) { // Request code 4321
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                picture.setImageBitmap(petBitPicResize);
-                new ImageSaver().setExternal(true).setFileName().save(petBitPicResize);
-            }
-        }
-        if (requestCode == CAM_STORAGE_PERMISSION_REQUEST) { // Request code 5432
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                try{
-                    Context inContext = getApplicationContext();
-                    petBitPicResize = ImageSaver.getCorrectlyOrientedImage(getApplicationContext(), ImageSaver.getImageUri(petBitPicResize, inContext), path, "Uploaded");
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            switch (requestCode) {
+                case CAMERA_PERMISSION_REQUEST: {
+                    progressBar.setVisibility(View.GONE);
+                    profileLayout.setAlpha(1);
+                    takePicture();
+                    break;
+                } case GAL_STORAGE_PERMISSION_REQUEST: {
+                    progressBar.setVisibility(View.GONE);
+                    profileLayout.setAlpha(1);
                     picture.setImageBitmap(petBitPicResize);
-                    new ImageSaver().setExternal(true).setFileName().save(petBitPicResize);
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
+                    areChangesUnsaved = true;
+                    break;
+                } case CAM_STORAGE_PERMISSION_REQUEST: {
+                    progressBar.setVisibility(View.VISIBLE);
+                    profileLayout.setAlpha(0.5f);
+                    setCameraBitmap();
+                    break;
                 }
             }
+        }
+        else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
+            progressBar.setVisibility(View.GONE);
+            profileLayout.setAlpha(1);
         }
     }
-
 }

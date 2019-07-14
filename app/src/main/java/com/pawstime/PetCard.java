@@ -4,16 +4,17 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.pawstime.activities.BaseActivity;
 import com.pawstime.activities.HomePage;
+
 
 public class PetCard extends CardView {
     public TextView name;
     public ConstraintLayout layout;
     public CardView petCardView;
-    public ImageView picture;
+    public de.hdodenhof.circleimageview.CircleImageView picture;
     public PetCard(@NonNull Context context) {
         super(context);
         inflate(getContext(), R.layout.pet_card_layout, this);
@@ -21,7 +22,6 @@ public class PetCard extends CardView {
         layout = findViewById(R.id.petCardLayout);
         petCardView = findViewById(R.id.petCardCard);
         picture = findViewById(R.id.petCardPicture);
-
 
         petCardView.setOnClickListener(v -> click(context));
         picture.setOnClickListener(v -> click(context));
@@ -38,5 +38,9 @@ public class PetCard extends CardView {
 
     public void click(Context context) {
         HomePage.clickPetCard(getName(), context);
+    }
+
+    public void setPicture(String path) {
+        BaseActivity.loadPic(ImageSaver.ICON_SIZE, picture, path);
     }
 }
