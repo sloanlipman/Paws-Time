@@ -2,22 +2,12 @@ package com.pawstime;
 
 public class Pet {
 
-    private static String currentPetName;
-    private static String currentPetType;
+    private static String currentPet;
 
-    public static void setCurrentPetName(String name) {
-        currentPetName = name;
+    public static void setCurrentPet(String pet) {
+        currentPet = pet;
     }
-    public static String getCurrentPetName() {
-        return currentPetName;
+    public static String getCurrentPet() {
+        return currentPet;
     }
-
-    public static void setCurrentPetType(String type) {
-        currentPetType = type;
-    }
-
-    public static String getCurrentPetType() {
-        return currentPetType;
-    }
-
 }

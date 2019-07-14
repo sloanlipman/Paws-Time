@@ -2,23 +2,24 @@ package com.pawstime.activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.ArrayMap;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,29 +31,43 @@ import com.pawstime.R;
 import com.pawstime.dialogs.AddPet;
 import com.pawstime.dialogs.SelectPet;
 import com.pawstime.Pet;
+import com.pawstime.dialogs.UnsavedChangesDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListener, SelectPet.SelectPetDialogListener {
+public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListener, SelectPet.SelectPetDialogListener, UnsavedChangesDialog.UnsavedChangesDialogListener {
     com.github.clans.fab.FloatingActionButton addPet, selectPet, export, save;
     com.github.clans.fab.FloatingActionMenu fabMenu;
     ImageView picture;
     Button changePicture;
     EditText description, careInstructions, medicalInfo, preferredVet, emergencyContact;
     TextView petNameAndType;
+
     private static final int CAMERA_PIC_REQUEST = 1337; // Request Code for returning picture from camera
     private static final int GALLERY_PIC_REQUEST = 7331; // Request Code for returning picture from gallery
     private static final int CAMERA_PERMISSION_REQUEST = 1234; // Request Code for camera permission
     private static final int GAL_STORAGE_PERMISSION_REQUEST = 4321; // Request Code for external storage permission
     private static final int CAM_STORAGE_PERMISSION_REQUEST = 5432; // Request Code for external storage permission
     private static String path;
+    Bitmap petBitPicResize;
 
+    
+    LocalBroadcastManager lbm;
+    boolean openSelectPetAfterUnsavedDialog = false;
+    boolean openAddPetAfterUnsavedDialog = false;
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("Pet", "Received");
+            openUnsavedDialog();
+        }
+    };
 
     @Override
     public int getContentViewId() {
@@ -61,7 +76,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
 
     @Override
     public int getNavigationMenuItemId() {
-        return R.id.navigation_viewPets;
+        return R.id.navigation_profile;
     }
 
     @Override
@@ -102,6 +117,49 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         openAddPetDialog();
     }
 
+    public void onUnsavedChangesDialogPositiveClick(DialogFragment dialog) {
+        savePetToFile();
+        if (openSelectPetAfterUnsavedDialog) {
+            openSelectPetDialog();
+        } else if (openAddPetAfterUnsavedDialog) {
+            openAddPetDialog();
+        } else {
+            performNavigate(requestedMenuItem);
+        }
+        fabMenu.close(true);
+    }
+
+    public void onUnsavedChangesDialogNegativeClick(DialogFragment dialog) {
+        if (openSelectPetAfterUnsavedDialog) {
+            openSelectPetDialog();
+        } else if (openAddPetAfterUnsavedDialog) {
+            openAddPetDialog();
+        } else {
+            performNavigate(requestedMenuItem);
+        }
+        fabMenu.close(true);
+    }
+
+    public void onUnsavedChangesDialogNeutralClick(DialogFragment dialog) {
+        fabMenu.close(true);
+        selectBottomNavigationBarItem(R.id.navigation_profile);
+    }
+
+   @Override
+   public void onStart() {
+       super.onStart();
+       // Register the receiver to the activity using a LocalBroadcastManager
+       IntentFilter intentFilter = new IntentFilter("com.pawstime.open_unsaved_dialog");
+       lbm =  LocalBroadcastManager.getInstance(getApplicationContext());
+       LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter);
+   }
+
+   @Override
+   public void onPause() {
+       super.onPause();
+       LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+   }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,7 +178,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
 
     //Loads image path using current pet name
     public void loadPath(){
-        path = ImageSaver.directoryName + Pet.getCurrentPetName() + ".png";
+        path = ImageSaver.directoryName + Pet.getCurrentPet() + ".png";
     }
 
     //Loads and resizes existing pet profile picture into ImageView
@@ -141,19 +199,64 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         preferredVet = findViewById(R.id.preferredVetName);
         emergencyContact = findViewById(R.id.emergencyContactInfo);
         petNameAndType = findViewById(R.id.petNameAndType);
-        String pet = Pet.getCurrentPetName() + " the " + Pet.getCurrentPetType();
-        petNameAndType.setText(pet);
+        petNameAndType.setText(Pet.getCurrentPet());
+        EditText[] editTexts = {description, careInstructions, medicalInfo, preferredVet, emergencyContact};
+        setAddTextChangedListener(editTexts);
+    }
+
+    public void setAddTextChangedListener(EditText[] editTexts) {
+        for (EditText editText : editTexts) {
+            editText.addTextChangedListener(new TextWatcher() {
+                String currentText = "";
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    currentText = s.toString();
+                    areChangesUnsaved = false;
+                    System.out.println("Before Text changed " + s.toString());
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (!currentText.equals(s.toString())) {
+                        areChangesUnsaved = true;
+                    }
+                    System.out.println("On Text changed " + s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+        }
     }
 
     public void initializeFabMenu() {
         selectPet = findViewById(R.id.selectPet);
-        selectPet.setOnClickListener(v -> openSelectPetDialog());
+        selectPet.setOnClickListener(v -> {
+            openAddPetAfterUnsavedDialog = false;
+            openSelectPetAfterUnsavedDialog = false;
+            if (areChangesUnsaved) {
+                openSelectPetAfterUnsavedDialog = true;
+                openUnsavedDialog();
+            } else {
+                openSelectPetDialog();
+            }
+        });
 
         save = findViewById(R.id.save);
         save.setOnClickListener(v -> savePetToFile());
 
         addPet = findViewById(R.id.addPet);
-        addPet.setOnClickListener(v -> openAddPetDialog());
+        addPet.setOnClickListener(v -> {
+            openAddPetAfterUnsavedDialog = false;
+            openSelectPetAfterUnsavedDialog = false;
+            if (areChangesUnsaved) {
+                openAddPetAfterUnsavedDialog = true;
+                openUnsavedDialog();
+            } else {
+                openAddPetDialog();
+            }
+        });
 
         export = findViewById(R.id.export);
         export.setOnClickListener(v -> exportPet());
@@ -245,8 +348,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
     public void savePetToFile() {
     // Read values from the UI
         ArrayMap<String, String> map = new ArrayMap<>();
-        map.put("name", Pet.getCurrentPetName());
-        map.put("type", Pet.getCurrentPetType());
+        map.put("nameAndType", Pet.getCurrentPet());
         map.put("description", description.getText().toString());
         map.put("careInstructions", careInstructions.getText().toString());
         map.put("medicalInfo", medicalInfo.getText().toString());
@@ -257,7 +359,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         JSONObject json = new JSONObject(map);
 
     // Save the JSON into a file
-        String filename = Pet.getCurrentPetName();
+        String filename = Pet.getCurrentPet();
         FileOutputStream outputStream;
         try {
             outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
@@ -265,6 +367,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             outputStream.close(); // Don't forget to close the stream!
             Toast.makeText(this, "Pet successfully saved!", Toast.LENGTH_SHORT).show();
             fabMenu.close(true);
+            areChangesUnsaved = false;
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
@@ -278,9 +381,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             json = (JSONObject) new JSONTokener(jsonString).nextValue(); // Turn the String into JSON
 
             // Set the values on the UI
-            String name = json.getString("name");
-            String type = json.getString("type");
-            String nameAndType = name + " the " + type;
+            String nameAndType = json.getString("nameAndType");
 
             petNameAndType.setText(nameAndType);
             editTextToJson(json, "description", description);
@@ -344,11 +445,16 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         }
     }
 
+    void openUnsavedDialog() {
+        DialogFragment unsavedChangesDialog = new UnsavedChangesDialog();
+        unsavedChangesDialog.show(getSupportFragmentManager(), "unsavedChangesDialog");
+    }
 
-    Bitmap petBitPicResize;
     @Override
     // Pull selected image into app and set pet profile picture
     protected void onActivityResult (int requestCode, int resultCode, Intent data){
+        picture = findViewById(R.id.petPicture);
+        final String path = "/Paws_Time/img" + Pet.getCurrentPet() + ".png";
         if ((resultCode == Activity.RESULT_OK) && (data != null)){
             AlertDialog.Builder requestBuilder = new AlertDialog.Builder(PetProfile.this);
             if (requestCode == CAMERA_PIC_REQUEST){ //Request code 1337
@@ -444,4 +550,5 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             }
         }
     }
+
 }

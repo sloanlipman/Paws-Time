@@ -82,7 +82,7 @@ public class SelectPet extends DialogFragment {
     }
 
     void addPets(ArrayList<String> listOfPets, Context context) {
-        String currentPet = Pet.getCurrentPetName();
+        String currentPet = Pet.getCurrentPet();
         for (int i = 0; i < listOfPets.size(); i++) {
             RadioButton rb = new RadioButton(context);
             rb.setId(i);
@@ -98,7 +98,7 @@ public class SelectPet extends DialogFragment {
         if(radioGroup.getCheckedRadioButtonId() != -1) {
             int selectedId = radioGroup.getCheckedRadioButtonId();
             RadioButton selectedPet = rootView.findViewById(selectedId);
-            Pet.setCurrentPetName(selectedPet.getText().toString());
+            Pet.setCurrentPet(selectedPet.getText().toString());
             return true;
         }
         return false;
