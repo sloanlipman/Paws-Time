@@ -46,7 +46,4 @@ public class RemindersList extends BaseActivity implements AddReminder.AddRemind
             newReminder.show(getSupportFragmentManager(), "newReminder");
         });
     }
-
-
-
 }
