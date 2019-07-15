@@ -113,47 +113,39 @@ public class AddReminder extends DialogFragment {
             }
         }
 
-        // If pet is a new pet
-        if (!remindersList.contains(name)) {
-            ArrayMap<String, String> map = new ArrayMap<>();
-            map.put("name", name);
-            map.put("type", type);
-            JSONObject json = new JSONObject(map);
+        ArrayMap<String, String> map = new ArrayMap<>();
+        map.put("message", reminderText.getText().toString());
+        JSONObject json = new JSONObject(map);
 
+        try {
+            outputStream = context.openFileOutput(name, Context.MODE_PRIVATE);
+            outputStream.write(json.toString().getBytes());
+            outputStream.close(); // Don't forget to close the stream!
+            Toast.makeText(context, "Reminder successfully added!", Toast.LENGTH_SHORT).show();
+
+            // If added, write to list of files
             try {
-                outputStream = context.openFileOutput(name, Context.MODE_PRIVATE);
-                outputStream.write(json.toString().getBytes());
-                outputStream.close(); // Don't forget to close the stream!
-                Toast.makeText(context, "Reminder successfully added!", Toast.LENGTH_SHORT).show();
 
-                // If added, write to list of files
-                try {
-
-                    StringBuilder pets = new StringBuilder();
-                    for (String reminder: remindersList) {
-                        pets.append(reminder);
-                        pets.append(",");
-                    }
-
-                    String petsToWrite = new String(pets);
-
-                    outputStream = context.openFileOutput("profile", Context.MODE_PRIVATE);
-                    outputStream.write(petsToWrite.getBytes()); // Write previous pets
-                    outputStream.write((name + ",").getBytes()); // Append new pet's name and a separator (comma)
-                    outputStream.close();
-                    Pet.setCurrentPetName(name);
-                    Pet.setCurrentPetType(type);
-                    return true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-
+                StringBuilder reminderSb = new StringBuilder();
+                for (String reminder: remindersList) {
+                    reminderSb.append(reminder);
+                    reminderSb.append(",");
                 }
+
+                String reminderToWrite = new String(reminderSb);
+
+                outputStream = context.openFileOutput("profile", Context.MODE_PRIVATE);
+                outputStream.write(reminderToWrite.getBytes()); // Write previous reminders
+                outputStream.write((name + ",").getBytes()); // Append new reminder and a separator (comma)
+                outputStream.close();
+                return true;
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(context, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
+
             }
-        } else {
-            Toast.makeText(context, "A pet with this name already exists! Please enter a unique name", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
         }
         return false;
     }
