@@ -6,22 +6,40 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
+import android.util.ArrayMap;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.pawstime.Pet;
 import com.pawstime.R;
+import com.pawstime.activities.BaseActivity;
+import com.pawstime.activities.RemindersList;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.util.ArrayList;
 
 public class AddReminder extends DialogFragment {
 
     private EditText reminderText;
-    private CheckBox alarmSelect;
-    private Spinner repeatSelectSpinner;
-    private Spinner petSelectSpinner;
-    private Button selectDateButton;
-    private Button selectTimeButton;
+    private String reminderString;
+
+    private DatePicker datePicker;
+    private TimePicker timePicker;
+
+    public LayoutInflater inflater;
+    public View rootView;
 
     public interface AddReminderListener {
         void onDialogPositiveClick(DialogFragment dialog);
@@ -49,6 +67,14 @@ public class AddReminder extends DialogFragment {
     @Override
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        inflater = requireActivity().getLayoutInflater();
+        rootView = inflater.inflate(R.layout.add_reminder, null);
+
+        datePicker = rootView.findViewById(R.id.datePicker);
+        timePicker = rootView.findViewById(R.id.timePicker);
+        reminderText = rootView.findViewById(R.id.reminderText);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.new_reminder_title)
                 .setPositiveButton(R.string.save, (dialog, which) -> {
@@ -56,19 +82,94 @@ public class AddReminder extends DialogFragment {
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                     // Cancel
-                }).setView(R.layout.add_reminder);
-    // On passing events back to where the dialog was called from, see https://developer.android.com/guide/topics/ui/dialogs#PassingEvents
-        return builder.create();
+                }).setView(rootView);
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialog1 -> {
+            Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positive.setOnClickListener(v -> {
+                reminderString = reminderText.getText().toString();
+                if (reminderString.length() > 0) {
+                    if(save(reminderString, rootView.getContext())) {
+                        listener.onDialogPositiveClick(AddReminder.this);
+//                      dismiss();
+                    }
+                } else {
+                    Toast.makeText(rootView.getContext(), "Cannot save empty reminder.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            negative.setOnClickListener(v -> {
+                listener.onDialogNegativeClick(AddReminder.this);
+                dismiss();
+            });
+        });
+        return dialog;
     }
 
-    public void onDateClick(View view) {
+    public boolean save(String reminderString, Context context) {
+        FileOutputStream outputStream;
+        File directory = context.getFilesDir();
+        File reminders = new File(directory, "reminders");
+        ArrayList<String> remindersList = RemindersList.getRemindersList(context);
 
+        if (!reminders.exists()) {
+            try {
+                outputStream = context.openFileOutput("reminders", Context.MODE_PRIVATE);
+                outputStream.write("".getBytes());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        String day = datePicker.getDayOfMonth() + "";
+        String month = datePicker.getMonth() + "";
+        String year = datePicker.getYear() + "";
+
+        String hour = timePicker.getCurrentHour() + "";
+        String minute = timePicker.getCurrentMinute() + "";
+
+        ArrayMap<String, String> map = new ArrayMap<>();
+        map.put("message", reminderString);
+        map.put("day", day);
+        map.put("month", month);
+        map.put("year", year);
+        map.put("hour", hour);
+        map.put("minute", minute);
+
+        JSONObject json = new JSONObject(map);
+
+        try {
+            outputStream = context.openFileOutput("reminders", Context.MODE_PRIVATE);
+            outputStream.close(); // Don't forget to close the stream!
+            Toast.makeText(context, "Reminder successfully added!", Toast.LENGTH_SHORT).show();
+
+            // If added, write to list of files
+            try {
+
+
+                StringBuilder reminderSb = new StringBuilder();
+                for (String reminder: remindersList) {
+                    reminderSb.append(reminder);
+                    reminderSb.append("¿");
+                }
+
+                String reminderToWrite = new String(reminderSb);
+
+                outputStream = context.openFileOutput("reminders", Context.MODE_PRIVATE);
+                outputStream.write(reminderToWrite.getBytes()); // Write previous reminders
+                outputStream.write((json.toString() + "¿").getBytes()); // Append reminder and add separating comma
+                outputStream.close();
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
+        }
+        return false;
     }
-
-    public void onTimeClick(View view) {
-
-    }
-
-    //TODO Have date and time be selected in same picker
-    //https://www.tutorialspoint.com/android/android_datepicker_control.htm
 }
