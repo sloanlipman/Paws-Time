@@ -4,36 +4,37 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.pawstime.activities.HomePage;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class ReminderCard extends CardView {
+
     public TextView reminder;
+    public TextView date;
     public ConstraintLayout layout;
     public CardView reminderCardView;
+
     public ReminderCard(@NonNull Context context) {
         super(context);
         inflate(getContext(), R.layout.reminder_card_item_layout, this);
-        reminder = findViewById(R.id.reminderCardItemName);
+        reminder = findViewById(R.id.reminderTv);
+        date = findViewById(R.id.dateTv);
         layout = findViewById(R.id.reminderCardLayout);
         reminderCardView = findViewById(R.id.reminderCardItem);
-
-
-//        reminderCardView.setOnClickListener(v -> click(context));
-//        reminder.setOnClickListener(v -> click(context));
     }
 
     public void setReminder(String newReminder) {
         reminder.setText(newReminder);
     }
 
-    public String getReminder() {
-        return reminder.getText().toString();
-    }
+    public void setDate(int month, int day, int year, int hour, int minute) {
 
-//    public void click(Context context) {
-//        HomePage.clickPetCard(getReminder(), context);
-//    }
+        Calendar cal = Calendar.getInstance();
+        cal.set(year + 1900, month, day, hour, minute);
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mm a");
+        date.setText((dateFormat.format(cal.getTime())));
+    }
 }

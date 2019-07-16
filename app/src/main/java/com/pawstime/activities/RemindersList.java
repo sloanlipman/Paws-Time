@@ -18,7 +18,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class RemindersList extends BaseActivity implements AddReminder.AddReminderListener {
     FloatingActionButton addReminder;
@@ -73,6 +72,12 @@ public class RemindersList extends BaseActivity implements AddReminder.AddRemind
             try {
                 JSONObject json = (JSONObject) new JSONTokener(reminder).nextValue();
                 cardView.setReminder(json.getString("message"));
+                int day = Integer.parseInt(json.getString("day"));
+                int month = Integer.parseInt(json.getString("month"));
+                int year = Integer.parseInt(json.getString("year"));
+                int minute = Integer.parseInt(json.getString("minute"));
+                int hour = Integer.parseInt(json.getString("hour"));
+                cardView.setDate(month, day, year, hour, minute);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
