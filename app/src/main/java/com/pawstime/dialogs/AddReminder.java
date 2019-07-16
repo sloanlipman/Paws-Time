@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.pawstime.Pet;
 import com.pawstime.R;
 import com.pawstime.activities.BaseActivity;
+import com.pawstime.activities.RemindersList;
 
 import org.json.JSONObject;
 
@@ -89,9 +90,10 @@ public class AddReminder extends DialogFragment {
             positive.setOnClickListener(v -> {
                 reminderString = reminderText.getText().toString();
                 if (reminderString.length() > 0) {
-                    save(reminderString, rootView.getContext());
-                    listener.onDialogPositiveClick(AddReminder.this);
-                    dismiss();
+                    if(save(reminderString, rootView.getContext())) {
+                        listener.onDialogPositiveClick(AddReminder.this);
+//                      dismiss();
+                    }
                 } else {
                     Toast.makeText(rootView.getContext(), "Cannot save empty reminder.", Toast.LENGTH_SHORT).show();
                 }
@@ -110,7 +112,7 @@ public class AddReminder extends DialogFragment {
         FileOutputStream outputStream;
         File directory = context.getFilesDir();
         File reminders = new File(directory, "reminders");
-        ArrayList<String> remindersList = getRemindersList(context);
+        ArrayList<String> remindersList = RemindersList.getRemindersList(context);
 
         if (!reminders.exists()) {
             try {
@@ -150,14 +152,14 @@ public class AddReminder extends DialogFragment {
                 StringBuilder reminderSb = new StringBuilder();
                 for (String reminder: remindersList) {
                     reminderSb.append(reminder);
-                    reminderSb.append(",");
+                    reminderSb.append("¿");
                 }
 
                 String reminderToWrite = new String(reminderSb);
 
                 outputStream = context.openFileOutput("reminders", Context.MODE_PRIVATE);
                 outputStream.write(reminderToWrite.getBytes()); // Write previous reminders
-                outputStream.write((json.toString() + ",").getBytes()); // Append reminder and add separating comma
+                outputStream.write((json.toString() + "¿").getBytes()); // Append reminder and add separating comma
                 outputStream.close();
                 return true;
             } catch (Exception e) {
@@ -169,30 +171,5 @@ public class AddReminder extends DialogFragment {
             Toast.makeText(context, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
         }
         return false;
-    }
-
-    public static ArrayList<String> getRemindersList(Context context) {
-        FileReader fr;
-        BufferedReader reader;
-        String stream;
-        ArrayList<String> remindersList = new ArrayList<>();
-        File directory = context.getFilesDir();
-        File reminders = new File(directory, "reminders");
-
-        try {
-            fr = new FileReader(reminders);
-            reader = new BufferedReader(fr);
-            while ((stream = reader.readLine()) != null) {
-                String[] reminderStringArray = stream.split(",");
-                for (String reminder : reminderStringArray) {
-                    remindersList.add(reminder);
-                }
-            }
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return remindersList;
     }
 }
