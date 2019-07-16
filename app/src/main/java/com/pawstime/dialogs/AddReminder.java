@@ -81,7 +81,7 @@ public class AddReminder extends DialogFragment {
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                     // Cancel
-                }).setView(R.layout.add_reminder);
+                }).setView(rootView);
 
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(dialog1 -> {
@@ -130,7 +130,6 @@ public class AddReminder extends DialogFragment {
 
         ArrayMap<String, String> map = new ArrayMap<>();
         map.put("message", reminderString);
-        System.out.println("Field should be " + reminderString);
         map.put("day", day);
         map.put("month", month);
         map.put("year", year);
@@ -160,8 +159,6 @@ public class AddReminder extends DialogFragment {
                 outputStream.write(reminderToWrite.getBytes()); // Write previous reminders
                 outputStream.write((json.toString() + ",").getBytes()); // Append reminder and add separating comma
                 outputStream.close();
-                System.out.println(reminderToWrite);
-                System.out.println("Did I get this far");
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();

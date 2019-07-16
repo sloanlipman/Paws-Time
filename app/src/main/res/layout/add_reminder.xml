@@ -16,7 +16,7 @@
         android:ems="10"
         android:hint="@string/message"
         android:importantForAutofill="no"
-        android:inputType="textMultiLine"
+        android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/datePicker"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
