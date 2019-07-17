@@ -1,11 +1,20 @@
 package com.pawstime.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 
 import com.pawstime.ImageSaver;
@@ -19,10 +28,12 @@ import com.pawstime.dialogs.SelectPet;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class HomePage extends BaseActivity implements AddPet.AddPetDialogListener, SelectPet.SelectPetDialogListener {
     ImageView homeLogo;
+    Button appChanger;
 
     @Override
     public void onAddPetDialogPositiveClick(DialogFragment dialog) {
@@ -63,6 +74,7 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         homeLogo = findViewById(R.id.homeLogo);
+        appChanger = findViewById(R.id.appChanger);
 
         setLogo();
         checkForPets();
@@ -106,6 +118,40 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
         Pet.setCurrentPet(name);
         startProfileActivity(context);
     }
+
+    //Order Supplies button allows user to go to Amazon or Chewy
+    public void orderSupplies(View v){
+        AlertDialog.Builder picBuilder = new AlertDialog.Builder(this);
+        picBuilder.setMessage("Would you like to order supplies from Amazon or Chewy?")
+                .setCancelable(true)
+                .setPositiveButton("Chewy", (dialog, id) -> openApp("com.chewy.android", "https://chewy.com"))
+                .setNegativeButton("Amazon", (dialog, id) -> openApp("com.amazon.mShop.android.shopping", "https://amazon.com"));
+        AlertDialog pictureAlert = picBuilder.create();
+        pictureAlert.setTitle("Order Pet Supplies");
+        pictureAlert.show();
+    }
+
+    //Checks phone for app if app doesn't exist opens webpage
+    public void openApp(String appName, String webName){
+        Intent i = getPackageManager().getLaunchIntentForPackage(appName);
+
+        if (i==null){
+            Uri webpage = Uri.parse(webName);
+            Intent webintent = new Intent(Intent.ACTION_VIEW, webpage);
+
+            PackageManager packageManager = getPackageManager();
+            List<ResolveInfo> activities = packageManager.queryIntentActivities(webintent, 0);
+            boolean isIntentSafe = activities.size() > 0;
+            if (isIntentSafe){
+                startActivity(webintent);
+            }
+            else
+                Toast.makeText(getApplicationContext(), "No app available to handle this request.", Toast.LENGTH_LONG).show();
+        }
+        else
+            startActivity(i);
+    }
+
 }
 
 
