@@ -1,8 +1,10 @@
 package com.pawstime.activities;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.DialogFragment;
@@ -11,11 +13,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
+import com.pawstime.ImageSaver;
 import com.pawstime.Pet;
 import com.pawstime.R;
 import com.pawstime.dialogs.AddPet;
 import com.pawstime.dialogs.SelectPet;
+import com.pawstime.dialogs.UnsavedChangesDialog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 
 public abstract class BaseActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -36,6 +42,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     static String currentActivity = "Home";
     static MenuItem requestedMenuItem;
     boolean areChangesUnsaved = false;
+    public static String path;
 
     private void updateNavigationBarState() {
         int actionId = this.getNavigationMenuItemId();
@@ -75,9 +82,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
         requestedMenuItem = item;
         if (currentActivity.equals("Profile") && requestedMenuItem.getItemId() != R.id.navigation_profile && areChangesUnsaved) { // && !someCheckForUnsavedChangesMethod()
-            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("com.pawstime.open_unsaved_dialog"));
+            openUnsavedDialog();
         } else {
             performNavigate(requestedMenuItem);
         }
@@ -125,6 +133,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         selectPet.show(getSupportFragmentManager(), "selectPet");
     }
 
+    void openUnsavedDialog() {
+        DialogFragment unsavedChangesDialog = new UnsavedChangesDialog();
+        unsavedChangesDialog.show(getSupportFragmentManager(), "unsavedChangesDialog");
+    }
+
     public static ArrayList<String> getPetsList(Context context) {
         FileReader fr;
         BufferedReader reader;
@@ -170,5 +183,20 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         context.startActivity(i);
         ((Activity)context).finish();
     }
+
+    //Loads and resizes existing pet profile picture into ImageView
+    public static void loadPic(int picSize, ImageView pic, String path) {
+        if ((path != null) && (ImageSaver.load(path) != null)){
+            Bitmap picResize = ImageSaver.resizeBitmap(Objects.requireNonNull(ImageSaver.load(path)), picSize);
+            pic.setImageBitmap(picResize);
+        }
+    }
+
+
+    //Loads image path using current pet name
+    public void loadPath(){
+        path = ImageSaver.directoryName + Pet.getCurrentPet() + ".png";
+    }
+
 
 }

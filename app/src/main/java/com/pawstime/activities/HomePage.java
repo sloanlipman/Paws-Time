@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 
+import com.pawstime.ImageSaver;
 import com.pawstime.Pet;
 import com.pawstime.PetCard;
 import com.pawstime.R;
@@ -25,6 +26,7 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
 
     @Override
     public void onAddPetDialogPositiveClick(DialogFragment dialog) {
+        currentActivity = "Profile";
         startProfileActivity(this);
     }
 
@@ -95,11 +97,11 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
         for (int i = 0; i < listOfPets.size(); i++) {
             PetCard cardView = new PetCard(this);
             cardView.setName(listOfPets.get(i));
-//            cardView.setPicture();
+            String imagePath = ImageSaver.directoryName + listOfPets.get(i) + ".png";
+            cardView.setPicture(imagePath);
             petList.addView(cardView);
         }
     }
-
     public static void clickPetCard(String name, Context context) {
         Pet.setCurrentPet(name);
         startProfileActivity(context);

@@ -1,19 +1,17 @@
 package com.pawstime;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import androidx.exifinterface.media.ExifInterface;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.pawstime.activities.PetProfile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,8 +19,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  Adapted from:
@@ -38,7 +34,7 @@ public class ImageSaver {
 
     //Constants for image resizing
     public static final int PROFILE_SIZE = 700;
-    public static final int ICON_SIZE = 100;
+    public static final int ICON_SIZE = 300;
 
     public ImageSaver() {
     }
@@ -164,7 +160,7 @@ public class ImageSaver {
     }
 
 
-    public static Bitmap getCorrectlyOrientedImage(Context context, Uri photoUri, String path, String source) throws IOException {
+    public static Bitmap getCorrectlyOrientedImage(Context context, Uri photoUri) throws IOException {
         InputStream is = context.getContentResolver().openInputStream(photoUri);
         BitmapFactory.Options dbo = new BitmapFactory.Options();
         dbo.inJustDecodeBounds = true;
@@ -172,15 +168,8 @@ public class ImageSaver {
         is.close();
 
         int rotatedWidth, rotatedHeight;
-        int orientation = 0;
-        switch (source) { //Need to specify whether the picture was from a default picture, which will use a filepath that already exists or if the picture is currently being uploaded from the Android device
-            case "Default":
-                orientation = getOrientation(path); //default picture
-                break;
-            case "Uploaded":
-                orientation = getOrientationFromMediaStore(context, photoUri); //uploaded from device
-                break;
-        }
+        int orientation = getOrientationFromMediaStore(context, photoUri); //uploaded from device
+
         if (orientation == 90 || orientation == 270) {
             rotatedWidth = dbo.outHeight;
             rotatedHeight = dbo.outWidth;
