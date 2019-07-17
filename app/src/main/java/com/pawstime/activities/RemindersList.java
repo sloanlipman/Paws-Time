@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import com.pawstime.ReminderCard;
 import com.pawstime.dialogs.AddReminder;
@@ -16,6 +17,7 @@ import org.json.JSONTokener;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 
@@ -52,7 +54,7 @@ public class RemindersList extends BaseActivity implements AddReminder.AddRemind
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        getRemindersList(this);
         populateRemindersList();
 
         addReminder = findViewById(R.id.addReminder);
@@ -69,6 +71,7 @@ public class RemindersList extends BaseActivity implements AddReminder.AddRemind
         for (int i = 0; i < listOfReminders.size(); i++) {
             String reminder = listOfReminders.get(i);
             ReminderCard cardView = new ReminderCard(this);
+            cardView.setIndex(i);
             try {
                 JSONObject json = (JSONObject) new JSONTokener(reminder).nextValue();
                 cardView.setReminder(json.getString("message"));
@@ -108,5 +111,28 @@ public class RemindersList extends BaseActivity implements AddReminder.AddRemind
         }
 
         return remindersList;
+    }
+
+    public static void deleteReminder(Context context, int index) {
+        FileOutputStream outputStream;
+        ArrayList<String> remindersList = getRemindersList(context);
+        remindersList.remove(remindersList.get(index));
+            // If added, write to list of files
+        try {
+
+            StringBuilder reminderSb = new StringBuilder();
+            for (String reminder: remindersList) {
+                reminderSb.append(reminder);
+                reminderSb.append("¿");
+            }
+
+            String reminderToWrite = new String(reminderSb);
+
+            outputStream = context.openFileOutput("reminders", Context.MODE_PRIVATE);
+            outputStream.write(reminderToWrite.getBytes()); // Write previous reminders
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
