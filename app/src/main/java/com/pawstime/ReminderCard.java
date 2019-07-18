@@ -29,7 +29,7 @@ public class ReminderCard extends CardView {
         reminder = findViewById(R.id.reminderTv);
         date = findViewById(R.id.dateTv);
         layout = findViewById(R.id.reminderCardLayout);
-        reminderCardView = findViewById(R.id.reminderCardItem);
+        reminderCardView = findViewById(R.id.petCard);
 
         Activity activity = (Activity) context;
 

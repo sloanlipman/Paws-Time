@@ -107,11 +107,11 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
 
         ArrayList<String> listOfPets = getPetsList(this);
         for (int i = 0; i < listOfPets.size(); i++) {
-            PetCard cardView = new PetCard(this);
-            cardView.setName(listOfPets.get(i));
+            PetCard petCard = new PetCard(this);
+            petCard.setName(listOfPets.get(i));
             String imagePath = ImageSaver.directoryName + listOfPets.get(i) + ".png";
-            cardView.setPicture(imagePath);
-            petList.addView(cardView);
+            petCard.setPicture(imagePath);
+            petList.addView(petCard);
         }
     }
     public static void clickPetCard(String name, Context context) {
@@ -135,7 +135,7 @@ public class HomePage extends BaseActivity implements AddPet.AddPetDialogListene
     public void openApp(String appName, String webName){
         Intent i = getPackageManager().getLaunchIntentForPackage(appName);
 
-        if (i==null){
+        if (i == null){
             Uri webpage = Uri.parse(webName);
             Intent webintent = new Intent(Intent.ACTION_VIEW, webpage);
 

@@ -150,7 +150,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             fr = new FileReader(profile);
             reader = new BufferedReader(fr);
             while((stream = reader.readLine()) != null) {
-                String[] pets = stream.split(",");
+                String[] pets = stream.split("¿");
                 petList.addAll(Arrays.asList(pets));
             }
             reader.close();

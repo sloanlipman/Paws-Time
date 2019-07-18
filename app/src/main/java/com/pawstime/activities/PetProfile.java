@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -494,7 +495,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
             StringBuilder pets = new StringBuilder();
             for (String pet: currentListOfPets) {
                     pets.append(pet);
-                    pets.append(",");
+                    pets.append("¿");
             }
 
             outputStream = openFileOutput("profile", Context.MODE_PRIVATE);
@@ -591,6 +592,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         } catch (IOException e) {
             e.printStackTrace();
         }
+        petBitPicResize = ImageSaver.resizeBitmap(petBitPicResize, ImageSaver.PROFILE_SIZE);
         picture.setImageBitmap(petBitPicResize);
         areChangesUnsaved = true;
         progressBar.setVisibility(View.GONE);
