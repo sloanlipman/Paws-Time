@@ -10,18 +10,21 @@
 
     <ProgressBar
         android:id="@+id/indeterminateBar"
-        android:layout_width="125dp"
-        android:layout_height="155dp"
+        android:layout_width="310dp"
+        android:layout_height="350dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:elevation="1000dp"
+        android:indeterminateTint="#BF58857E"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -50,22 +53,24 @@
                 android:background="#00361A1A"
                 android:orientation="vertical">
 
+
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/petPicture"
-                    android:layout_width="169dp"
-                    android:layout_height="106dp"
+                    android:layout_width="251dp"
+                    android:layout_height="246dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_paws_time"
-                    app:civ_border_color="#FF000000"
+                    app:civ_border_color="#FF58857e"
                     app:civ_border_width="2dp"
                     tools:srcCompat="@tools:sample/avatars" />
 
-
                 <Button
                     android:id="@+id/changePicture"
-                    android:layout_width="wrap_content"
+                    android:layout_width="145dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/button"
                     android:text="@string/change_picture" />
 
             </LinearLayout>
@@ -93,7 +98,7 @@
             <EditText
                 android:id="@+id/petDesc"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="126dp"
                 android:ems="10"
                 android:hint="@string/pet_description"
                 android:inputType="textMultiLine|textCapSentences"
@@ -225,8 +230,8 @@
         fab:menu_animationDelayPerItem="50"
         fab:menu_backgroundColor="#80000000"
         fab:menu_buttonSpacing="0dp"
-        fab:menu_colorNormal="#DA4336"
-        fab:menu_colorPressed="#E75043"
+        fab:menu_colorNormal="#58857e"
+        fab:menu_colorPressed="#8dbab3"
         fab:menu_colorRipple="#99FFFFFF"
         fab:menu_fab_label=""
         fab:menu_fab_size="normal"
@@ -263,7 +268,9 @@
             android:layout_height="wrap_content"
             android:src="@drawable/fab_add"
             fab:fab_label="@string/add_new_pet"
-            fab:fab_size="mini" />
+            fab:fab_size="mini"
+            fab:fab_colorNormal="#8dbab3"
+            fab:fab_colorPressed="#AFE9E1"/>
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/selectPet"
@@ -271,7 +278,9 @@
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_swap_horizontal_circle_black_18dp"
             fab:fab_label="@string/change_pet"
-            fab:fab_size="mini" />
+            fab:fab_size="mini"
+            fab:fab_colorNormal="#8dbab3"
+            fab:fab_colorPressed="#AFE9E1"/>
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/export"
@@ -279,7 +288,9 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_menu_share"
             fab:fab_label="@string/export_pet_details"
-            fab:fab_size="mini" />
+            fab:fab_size="mini"
+            fab:fab_colorNormal="#8dbab3"
+            fab:fab_colorPressed="#AFE9E1"/>
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/save"
@@ -287,7 +298,9 @@
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_save_black_18dp"
             fab:fab_label="@string/save_changes"
-            fab:fab_size="mini" />
+            fab:fab_size="mini"
+            fab:fab_colorNormal="#8dbab3"
+            fab:fab_colorPressed="#AFE9E1"/>
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/delete"
@@ -295,8 +308,9 @@
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_delete_black_18dp"
             fab:fab_label="@string/delete_profile"
-            fab:fab_size="mini" />
-
+            fab:fab_size="mini"
+            fab:fab_colorNormal="#8dbab3"
+            fab:fab_colorPressed="#AFE9E1"/>
 
     </com.github.clans.fab.FloatingActionMenu>
 

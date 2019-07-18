@@ -123,14 +123,14 @@ public class AddPet extends DialogFragment{
                     StringBuilder pets = new StringBuilder();
                     for (String pet: petList) {
                         pets.append(pet);
-                        pets.append(",");
+                        pets.append("¿");
                     }
 
                     String petsToWrite = new String(pets);
 
                     outputStream = context.openFileOutput("profile", Context.MODE_PRIVATE);
                     outputStream.write(petsToWrite.getBytes()); // Write previous pets
-                    outputStream.write((newPet + ",").getBytes()); // Append new pet's name and a separator (comma)
+                    outputStream.write((newPet + "¿").getBytes()); // Append new pet's name and a separator (comma)
                     outputStream.close();
                     Pet.setCurrentPet(newPet);
                     return true;

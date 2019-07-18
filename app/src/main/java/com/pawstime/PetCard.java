@@ -11,29 +11,28 @@ import com.pawstime.activities.HomePage;
 
 
 public class PetCard extends CardView {
-    public TextView name;
     public ConstraintLayout layout;
-    public CardView petCardView;
+    public CardView petCard;
+    public TextView petCardName;
     public de.hdodenhof.circleimageview.CircleImageView picture;
     public PetCard(@NonNull Context context) {
         super(context);
         inflate(getContext(), R.layout.pet_card_layout, this);
-        name = findViewById(R.id.petCardName);
         layout = findViewById(R.id.petCardLayout);
-        petCardView = findViewById(R.id.petCardCard);
+        petCard = findViewById(R.id.petCard);
+        petCardName = findViewById(R.id.petCardName);
         picture = findViewById(R.id.petCardPicture);
 
-        petCardView.setOnClickListener(v -> click(context));
+        petCard.setOnClickListener(v -> click(context));
         picture.setOnClickListener(v -> click(context));
-        name.setOnClickListener(v -> click(context));
     }
 
     public void setName(String newName) {
-        name.setText(newName);
+        petCardName.setText(newName);
     }
 
     public String getName() {
-        return name.getText().toString();
+        return petCardName.getText().toString();
     }
 
     public void click(Context context) {
