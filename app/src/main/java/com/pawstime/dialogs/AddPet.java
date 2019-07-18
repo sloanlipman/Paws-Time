@@ -143,7 +143,7 @@ public class AddPet extends DialogFragment{
                 Toast.makeText(context, "Something went wrong. Please try again.", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Toast.makeText(context, "A pet with this name already exists! Please enter a unique name", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "A pet with this name already exists! Please enter a unique name", Toast.LENGTH_LONG).show();
         }
         return false;
     }
