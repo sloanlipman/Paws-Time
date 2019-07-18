@@ -399,8 +399,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         JSONObject json;
 
         try {
-            json = (JSONObject) new JSONTokener(jsonString).nextValue(); // Turn the String into JSON
-
+            json = (JSONObject) new JSONTokener(jsonString).nextValue(); // Turn the String into JSON\
             // Set the values on the UI
             String nameAndType = json.getString("nameAndType");
 
