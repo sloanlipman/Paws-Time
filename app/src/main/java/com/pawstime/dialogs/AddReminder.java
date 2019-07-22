@@ -1,8 +1,15 @@
 package com.pawstime.dialogs;
 
+import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.icu.text.DateFormat;
+import android.icu.util.Calendar;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
@@ -17,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.pawstime.AlertReceiver;
 import com.pawstime.Pet;
 import com.pawstime.R;
 import com.pawstime.activities.BaseActivity;
@@ -40,6 +48,7 @@ public class AddReminder extends DialogFragment {
 
     public LayoutInflater inflater;
     public View rootView;
+    public static int REQ_CODE = 5;//Request Code For Alarm
 
     public interface AddReminderListener {
         void onDialogPositiveClick(DialogFragment dialog);
@@ -130,6 +139,8 @@ public class AddReminder extends DialogFragment {
         String hour = timePicker.getCurrentHour() + "";
         String minute = timePicker.getCurrentMinute() + "";
 
+        onTimeSet(Integer.parseInt(hour), Integer.parseInt(minute)); //Sets time for alarm
+
         ArrayMap<String, String> map = new ArrayMap<>();
         map.put("message", reminderString);
         map.put("day", day);
@@ -137,6 +148,7 @@ public class AddReminder extends DialogFragment {
         map.put("year", year);
         map.put("hour", hour);
         map.put("minute", minute);
+
 
         JSONObject json = new JSONObject(map);
 
@@ -172,4 +184,49 @@ public class AddReminder extends DialogFragment {
         }
         return false;
     }
+
+
+    //adapted from https://codinginflow.com/tutorials/android/alarmmanager
+    @TargetApi(Build.VERSION_CODES.N)
+    public void onTimeSet(int hourOfDay, int minute) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.SECOND, 0);
+
+
+        //Prevents you from setting a reminder alarm for a past date
+        if (c.before(Calendar.getInstance())) {
+            Toast.makeText(getActivity(), "Invalid Date, Please Try Again.", Toast.LENGTH_LONG).show();
+        }
+        else{
+            startAlarm(c);
+        }
+        reqCode();//Creates ID for alarm
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private void startAlarm(Calendar c) {
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getActivity(), AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), REQ_CODE, intent, 0);
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+    }
+
+    public static void reqCode(){
+//        int request = (int)(System.currentTimeMillis());
+//        REQ_CODE = request;
+    }
+
+    public static void cancelAlarm(Context c) {
+        AlarmManager alarmManager = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(c, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(c, REQ_CODE, intent, 0);
+
+        alarmManager.cancel(pendingIntent);
+        Toast.makeText(c, "Alarm Cancelled", Toast.LENGTH_LONG).show();
+    }
+
 }

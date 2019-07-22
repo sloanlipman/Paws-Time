@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import com.pawstime.ReminderCard;
 import com.pawstime.dialogs.AddReminder;

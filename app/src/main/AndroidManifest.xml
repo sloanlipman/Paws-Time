@@ -28,7 +28,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".activities.RemindersList" />
+        <activity android:name=".activities.RemindersList"/>
         <activity android:name=".activities.PetProfile" />
         <activity android:name=".activities.HomePage">
             <intent-filter>
@@ -44,6 +44,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".AlertReceiver" />
     </application>
 
 </manifest>

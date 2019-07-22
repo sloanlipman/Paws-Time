@@ -10,6 +10,7 @@ import android.support.v7.widget.CardView;
 import android.widget.TextView;
 
 import com.pawstime.activities.RemindersList;
+import com.pawstime.dialogs.AddReminder;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,6 +42,9 @@ public class ReminderCard extends CardView {
                         RemindersList.deleteReminder(context, index);
                         context.startActivity(new Intent(context, RemindersList.class));
                         activity.finish();
+
+                        //Delete alarm
+                        AddReminder.cancelAlarm(context);
                     })
                     .setNegativeButton(R.string.cancel, (dialog, which) -> {
                         // Cancel deletion
