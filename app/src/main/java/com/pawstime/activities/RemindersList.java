@@ -117,7 +117,7 @@ public class RemindersList extends BaseActivity implements AddReminder.AddRemind
         FileOutputStream outputStream;
         ArrayList<String> remindersList = getRemindersList(context);
         remindersList.remove(remindersList.get(index));
-            // If added, write to list of files
+
         try {
 
             StringBuilder reminderSb = new StringBuilder();
