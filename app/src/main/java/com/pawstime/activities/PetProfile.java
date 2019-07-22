@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -197,7 +196,9 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     currentText = s.toString();
-                    areChangesUnsaved = false;
+                    if (areChangesUnsaved) {
+                        areChangesUnsaved = false;
+                    }
                 }
 
                 @Override
@@ -530,6 +531,7 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                 if (ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                     showFilePermissionsRequest(CAM_STORAGE_PERMISSION_REQUEST).show(); // Request permissions if not yet granted
                 } else{
+                    areChangesUnsaved = true;
                     setCameraBitmap();
                 }
             }
@@ -542,9 +544,9 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                         petBitPicResize = petGalleryBitPic;
                         if (ContextCompat.checkSelfPermission(PetProfile.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                             showFilePermissionsRequest(GAL_STORAGE_PERMISSION_REQUEST).show(); // Request permissions if not yet granted
-                        } else{
-                            picture.setImageBitmap(petBitPicResize);
+                        } else {
                             areChangesUnsaved = true;
+                            picture.setImageBitmap(petBitPicResize);
                             progressBar.setVisibility(View.GONE);
                             profileLayout.setAlpha(1);
                         }
@@ -592,9 +594,9 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
         } catch (IOException e) {
             e.printStackTrace();
         }
+        areChangesUnsaved = true;
         petBitPicResize = ImageSaver.resizeBitmap(petBitPicResize, ImageSaver.PROFILE_SIZE);
         picture.setImageBitmap(petBitPicResize);
-        areChangesUnsaved = true;
         progressBar.setVisibility(View.GONE);
         profileLayout.setAlpha(1);
     }
@@ -611,10 +613,10 @@ public class PetProfile extends BaseActivity implements AddPet.AddPetDialogListe
                     takePicture();
                     break;
                 } case GAL_STORAGE_PERMISSION_REQUEST: {
+                    areChangesUnsaved = true;
                     progressBar.setVisibility(View.GONE);
                     profileLayout.setAlpha(1);
                     picture.setImageBitmap(petBitPicResize);
-                    areChangesUnsaved = true;
                     break;
                 } case CAM_STORAGE_PERMISSION_REQUEST: {
                     progressBar.setVisibility(View.VISIBLE);
