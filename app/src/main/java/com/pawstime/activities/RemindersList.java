@@ -1,14 +1,19 @@
 package com.pawstime.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.pawstime.AlertReceiver;
+import com.pawstime.R;
 import com.pawstime.ReminderCard;
 import com.pawstime.dialogs.AddReminder;
-import com.pawstime.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+
 
 public class RemindersList extends BaseActivity implements AddReminder.AddReminderListener {
     FloatingActionButton addReminder;
@@ -74,6 +80,7 @@ public class RemindersList extends BaseActivity implements AddReminder.AddRemind
             try {
                 JSONObject json = (JSONObject) new JSONTokener(reminder).nextValue();
                 cardView.setReminder(json.getString("message"));
+                cardView.setReqCode(Integer.parseInt(json.getString("reqCode")));
                 int day = Integer.parseInt(json.getString("day"));
                 int month = Integer.parseInt(json.getString("month"));
                 int year = Integer.parseInt(json.getString("year"));
@@ -134,4 +141,14 @@ public class RemindersList extends BaseActivity implements AddReminder.AddRemind
             e.printStackTrace();
         }
     }
+
+
+    public static void cancelAlarm(Context c, int reqCode) {
+        AlarmManager alarmManager = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(c, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(c, reqCode, intent, 0);
+        alarmManager.cancel(pendingIntent);
+        Toast.makeText(c, "Alarm Canceled", Toast.LENGTH_LONG).show();
+    }
+
 }

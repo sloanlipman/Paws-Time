@@ -12,7 +12,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,10 +36,6 @@ public class ImageSaver {
     public static final int ICON_SIZE = 300;
 
     public ImageSaver() {
-    }
-
-    ImageSaver(Context context) {
-        this.context = context;
     }
 
     //Create unique image file name
@@ -114,39 +109,7 @@ public class ImageSaver {
         return null;
     }
 
-    // Adapted from https://stackoverflow.com/questions/21085105/get-orientation-of-image-from-mediastore-images-media-data
-    private static int getOrientation(String filepath) {// YOUR MEDIA PATH AS STRING
-        int degree = 0;
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(filepath);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        if (exif != null) {
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
-            if (orientation != -1) {
-                switch (orientation) {
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        degree = 90;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        degree = 180;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        degree = 270;
-                        break;
-                }
-            }
-        }
-        return degree;
-    }
 
-    /*
-        Note:
-        Methods getOrientationFromMediaStore and getCorrectlyOrientedImage are adapted from:
-        https://stackoverflow.com/questions/3647993/android-bitmaps-loaded-from-gallery-are-rotated-in-imageview/8914291#8914291
-    */
     private static int getOrientationFromMediaStore(Context context, Uri photoUri) {
         Cursor cursor = context.getContentResolver().query(photoUri,
                 new String[]{MediaStore.Images.ImageColumns.ORIENTATION}, null, null, null);
