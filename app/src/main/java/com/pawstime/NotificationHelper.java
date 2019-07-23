@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
@@ -43,13 +44,17 @@ public class NotificationHelper extends ContextWrapper {
         return mManager;
     }
 
-    public NotificationCompat.Builder getChannelNotification() {
+    public NotificationCompat.Builder getChannelNotification(String message) {
         Intent resultIntent = new Intent(this, RemindersList.class);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        int reqCode = resultIntent.getIntExtra("reqCode", 0);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, reqCode, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
                 .setContentTitle("Paws Time Alarm!")
-                .setContentText("Open Paws Time to see pending reminder.")
-                .setSmallIcon(R.drawable.ic_paws_time)
+                .setContentText(message)
+                .setSmallIcon(R.drawable.baseline_alarm_black_18dp)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                        R.drawable.ic_paws_time))
                 .setAutoCancel(true)
                 .setContentIntent(resultPendingIntent);
     }

@@ -7,35 +7,30 @@ import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.icu.text.DateFormat;
 import android.icu.util.Calendar;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.pawstime.AlertReceiver;
-import com.pawstime.Pet;
 import com.pawstime.R;
-import com.pawstime.activities.BaseActivity;
 import com.pawstime.activities.RemindersList;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.util.ArrayList;
 
 public class AddReminder extends DialogFragment {
@@ -48,7 +43,6 @@ public class AddReminder extends DialogFragment {
 
     public LayoutInflater inflater;
     public View rootView;
-    public static int REQ_CODE = 5;//Request Code For Alarm
 
     public interface AddReminderListener {
         void onDialogPositiveClick(DialogFragment dialog);
@@ -131,7 +125,7 @@ public class AddReminder extends DialogFragment {
                 e.printStackTrace();
             }
         }
-
+        int reqCode = getReqCode(context);
         String day = datePicker.getDayOfMonth() + "";
         String month = datePicker.getMonth() + "";
         String year = datePicker.getYear() + "";
@@ -139,7 +133,7 @@ public class AddReminder extends DialogFragment {
         String hour = timePicker.getCurrentHour() + "";
         String minute = timePicker.getCurrentMinute() + "";
 
-        onTimeSet(Integer.parseInt(hour), Integer.parseInt(minute)); //Sets time for alarm
+        onTimeSet(context, Integer.parseInt(hour), Integer.parseInt(minute), reqCode, reminderString); //Sets time for alarm
 
         ArrayMap<String, String> map = new ArrayMap<>();
         map.put("message", reminderString);
@@ -148,7 +142,7 @@ public class AddReminder extends DialogFragment {
         map.put("year", year);
         map.put("hour", hour);
         map.put("minute", minute);
-
+        map.put("reqCode", String.valueOf(reqCode));
 
         JSONObject json = new JSONObject(map);
 
@@ -185,48 +179,55 @@ public class AddReminder extends DialogFragment {
         return false;
     }
 
-
     //adapted from https://codinginflow.com/tutorials/android/alarmmanager
     @TargetApi(Build.VERSION_CODES.N)
-    public void onTimeSet(int hourOfDay, int minute) {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        c.set(Calendar.MINUTE, minute);
-        c.set(Calendar.SECOND, 0);
-
+    public static void onTimeSet(Context context, int hourOfDay, int minute, int reqCode, String message) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        cal.set(Calendar.MINUTE, minute);
+        cal.set(Calendar.SECOND, 0);
 
         //Prevents you from setting a reminder alarm for a past date
-        if (c.before(Calendar.getInstance())) {
-            Toast.makeText(getActivity(), "Invalid Date, Please Try Again.", Toast.LENGTH_LONG).show();
+        if (cal.before(Calendar.getInstance())) {
+            Toast.makeText(context, "Invalid Date, Please Try Again.", Toast.LENGTH_LONG).show();
         }
         else{
-            startAlarm(c);
+            startAlarm(context, cal, reqCode, message);
         }
-        reqCode();//Creates ID for alarm
     }
 
 
     @TargetApi(Build.VERSION_CODES.N)
-    private void startAlarm(Calendar c) {
-        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(getActivity(), AlertReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), REQ_CODE, intent, 0);
+    private static void startAlarm(Context context, Calendar cal, int reqCode, String message) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlertReceiver.class);
+        intent.putExtra("reqCode", reqCode);
+        intent.putExtra("message", message);
 
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, reqCode, intent, 0);
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
     }
 
-    public static void reqCode(){
-//        int request = (int)(System.currentTimeMillis());
-//        REQ_CODE = request;
+
+    public static int getReqCode(Context context) {
+        int highestReq = 0;
+        ArrayList<String> remindersList = RemindersList.getRemindersList(context);
+        if (remindersList.size() > 0) {
+            for (int i = 0; i < remindersList.size(); i++) {
+                String reminder = remindersList.get(i);
+                try {
+                    int reqCode;
+                    JSONObject json = (JSONObject) new JSONTokener(reminder).nextValue();
+                    reqCode = Integer.parseInt(json.getString("reqCode"));
+                    if (reqCode > highestReq) {
+                        highestReq = reqCode;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return (highestReq + 1);
     }
-
-    public static void cancelAlarm(Context c) {
-        AlarmManager alarmManager = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(c, AlertReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(c, REQ_CODE, intent, 0);
-
-        alarmManager.cancel(pendingIntent);
-        Toast.makeText(c, "Alarm Cancelled", Toast.LENGTH_LONG).show();
-    }
-
 }

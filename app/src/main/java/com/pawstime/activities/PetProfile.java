@@ -32,11 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pawstime.ImageSaver;
+import com.pawstime.Pet;
 import com.pawstime.R;
 import com.pawstime.dialogs.AddPet;
 import com.pawstime.dialogs.DeleteProfile;
 import com.pawstime.dialogs.SelectPet;
-import com.pawstime.Pet;
 import com.pawstime.dialogs.UnsavedChangesDialog;
 
 import org.json.JSONException;
